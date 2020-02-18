@@ -9,6 +9,11 @@ public class GridManagerAPI : MonoBehaviour
 
     //GridSize (As the grid is always a square this will define how big one side is)
     [SerializeField] private int gridSize = 5;
+    //Returns GridSize
+    public int GridSize()
+    {
+        return gridSize;
+    }
 
     //Adds padding in between each tile
     //The SerilizeField tag shows the variable beside it in the inspector
@@ -21,19 +26,21 @@ public class GridManagerAPI : MonoBehaviour
 
     [SerializeField] private GameObject tileUIPrefab;
     [SerializeField] private RectTransform canvasTransform;
+    private ValueSettingHandler valueSettingHandler;
 
     //Lists will hold references to each individual tile
     private static List<GameObject> tiles = new List<GameObject>();
-    private static List<GameObject> movesUIList = new List<GameObject>();
+    private static List<GameObject> tileUIList = new List<GameObject>();
     public static List<Tile> tileDataList = new List<Tile>();
 
     private Vector3 instantiatePosition = Vector3.zero;
 
     private bool once = true;
+    public bool boardGenerated = false;
     // Start is called before the first frame update
     void Start()
     {
-        
+        valueSettingHandler = canvasTransform.GetComponent<ValueSettingHandler>();
     }
 
     // Update is called once per frame
@@ -44,16 +51,24 @@ public class GridManagerAPI : MonoBehaviour
             //Zoom out once so that all UI updates.
             mainCamera.orthographicSize++;
             once = true;
-        }        
+        }
+
+        if (valueSettingHandler.generateGrid)
+        {
+            valueSettingHandler.generateGrid = false;
+            CreateGrid_WithUI_InScene();
+        }
     }
 
-    public void CreateGrid_WithUI_InScene(int _gridSize)
+    public void CreateGrid_WithUI_InScene()
     {
+        DeactivateAllObjects();
+
         //Get a reference to the Main Camera in the scene
         mainCamera = Camera.main;
 
         //Set gridSize
-        gridSize = _gridSize;
+        gridSize = valueSettingHandler.NValue();
         //Instantiate Start Position
         instantiatePosition = new Vector3(-gridSize / 2, -gridSize / 2, 5);
         Vector3 middlePos = Vector3.zero;
@@ -62,30 +77,44 @@ public class GridManagerAPI : MonoBehaviour
         {
             for (int i = 0; i < gridSize; i++)
             {
-                for (int k = 0; k < gridSize; k++)
+                for (int y = 0; y < gridSize; y++)
                 {
-                    //Create the game objects in the world (Instantiate is like the new Keyword except it creates the gameobject in the world)
-                    GameObject ele = Instantiate(gridElement, instantiatePosition, Quaternion.identity, gridParent);
-                    GameObject tileUI = Instantiate(tileUIPrefab);
+                    if (i * gridSize + y >= tileDataList.Count)
+                    {
+                        //Create the game objects in the world (Instantiate is like the new Keyword except it creates the gameobject in the world)
+                        GameObject ele = Instantiate(gridElement, instantiatePosition, Quaternion.identity, gridParent);
+                        GameObject tileUI = Instantiate(tileUIPrefab);
 
+                        //Initialise the UI
+                        tileUI.transform.SetParent(canvasTransform, false);
+                        tileUI.GetComponent<UIPositionHandler>().SetData(ele.transform, canvasTransform);
+                        //legalMoveUI.GetComponent<UIPositionHandler>().SetUIPosition();
 
-                    //Initialise the UI
-                    tileUI.transform.SetParent(canvasTransform, false);
-                    tileUI.GetComponent<UIPositionHandler>().SetData(ele.transform, canvasTransform);
-                    //legalMoveUI.GetComponent<UIPositionHandler>().SetUIPosition();
+                        //Initialise the Tile by setting its data
+                        tileDataList.Add(ele.GetComponent<Tile>());
+                        tileDataList[tileDataList.Count - 1].InitializeTile(i, y, tileUI.GetComponent<UITextHandled>());
 
-                    //Initialise the Tile by setting its data
-                    tileDataList.Add(ele.GetComponent<Tile>());
-                    tileDataList[tileDataList.Count - 1].InitializeTile(i, k, tileUI.GetComponent<UITextHandled>());
+                        //Add objects to list for future references.
+                        tiles.Add(ele);
+                        tileUIList.Add(tileUI);
+                    }
+                    else
+                    {
+                        int pos = i * gridSize + y;
+                        tiles[pos].transform.position = instantiatePosition;
+                        tiles[pos].SetActive(true);
 
-                    //Add objects to list for future references.
-                    //tiles.Add(ele);
-                    //movesUIList.Add(tileUI);
+                        tileUIList[pos].SetActive(true);
+
+                        tileDataList[pos].x = i;
+                        tileDataList[pos].y = y;
+                    }
+                    
 
                     //Move the next instantiated tile a little bit to the left.
                     instantiatePosition.x += 1 + gridElePaddingX;
 
-                    if (i == gridSize / 2 && i == k + 1)
+                    if (i == gridSize / 2 && i == y + 1)
                     {
                         middlePos = instantiatePosition;
                     }
@@ -99,11 +128,21 @@ public class GridManagerAPI : MonoBehaviour
             //Adjust main camera position according to the center of the instantiated tiles.
             mainCamera.transform.position = new Vector3(middlePos.x, middlePos.y, mainCamera.transform.position.z);
             once = false;
+            boardGenerated = true;
         }
     }
 
     public void SetNumMovesForTile(int x, int y, int numMoves)
     {
         tileDataList[x * gridSize + y].SetNumMoves(numMoves);
+    }
+
+    private void DeactivateAllObjects()
+    {
+        for (int i = 0; i < tileDataList.Count; i++)
+        {
+            tiles[i].SetActive(false);
+            tileUIList[i].SetActive(false);
+        }
     }
 }

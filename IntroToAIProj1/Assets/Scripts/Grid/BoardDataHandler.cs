@@ -7,8 +7,6 @@ public class BoardDataHandler : MonoBehaviour
     public GameObject gridSceneObject;
     private GridManagerAPI gridAPI;
 
-    [SerializeField] private int gridSize = 5;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -21,46 +19,44 @@ public class BoardDataHandler : MonoBehaviour
         {
             Debug.LogError("GRID API IS NOT SET, ATTACH GridManagerAPI script to grid parent object.");
         }
-        else
-        {
-            //Creates the visible parts of the grid
-            gridAPI.CreateGrid_WithUI_InScene(gridSize);
-
-            //Part 1
-            for (int i = 0; i < gridSize; i++)
-            {
-                for (int j = 0; j < gridSize; j++)
-                {
-                    //Debug.Log("element: " + (i * gridSize + j));
-                    SetRandomLegalTileMove(i, j); 
-                }
-            }
-        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(gridAPI.boardGenerated == true)
+        {
+            //PART 2 OF PROJECT
+            SetRandomLegalTileMove();
+            gridAPI.boardGenerated = false;
+        }
     }
 
-    private void SetRandomLegalTileMove(int x, int y)
+    private void SetRandomLegalTileMove()
     {
-        int maxX = gridSize - x;
-        int maxY = gridSize - y;
-
-        //Random function's second parameter is exclusive
-        int randomX = Random.Range(1, maxX);
-        int randomY = Random.Range(1, maxY);
-
-        int random = Random.Range(0, 2);
-        if(random == 0)
+        for (int x = 0; x < gridAPI.GridSize(); x++)
         {
-            gridAPI.SetNumMovesForTile(x, y, randomX);
-        }
-        else
-        {
-            gridAPI.SetNumMovesForTile(x, y, randomY);
+            for (int y = 0; y < gridAPI.GridSize(); y++)
+            {
+                //Debug.Log("element: " + (i * gridSize + j));
+                int maxX = gridAPI.GridSize() - x;
+                int maxY = gridAPI.GridSize() - y;
+
+                //Random function's second parameter is exclusive
+                int randomX = Random.Range(1, maxX);
+                int randomY = Random.Range(1, maxY);
+
+                int random = Random.Range(0, 2);
+                if (random == 0)
+                {
+                    gridAPI.SetNumMovesForTile(x, y, randomX);
+                }
+                else
+                {
+                    gridAPI.SetNumMovesForTile(x, y, randomY);
+                }
+            }
         }
     }
+
 }

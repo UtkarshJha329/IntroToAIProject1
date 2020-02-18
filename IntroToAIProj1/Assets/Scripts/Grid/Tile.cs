@@ -8,6 +8,7 @@ public class Tile : MonoBehaviour
     public int y = 0;
 
     private int numMoves = 1;
+    private int depth = 0;
     private UITextHandled tileUI;
 
     // Start is called before the first frame update
