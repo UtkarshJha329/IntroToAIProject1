@@ -24,7 +24,6 @@ public class GridManagerAPI : MonoBehaviour
     [SerializeField] private GameObject gridElement;
     [SerializeField] private Transform gridParent;
 
-    [SerializeField] private GameObject tileUIPrefab;
     [SerializeField] private RectTransform canvasTransform;
     private ValueSettingHandler valueSettingHandler;
 
@@ -35,7 +34,6 @@ public class GridManagerAPI : MonoBehaviour
 
     private Vector3 instantiatePosition = Vector3.zero;
 
-    private bool once = true;
     public bool boardGenerated = false;
     // Start is called before the first frame update
     void Start()
@@ -46,13 +44,6 @@ public class GridManagerAPI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!once)
-        {
-            //Zoom out once so that all UI updates.
-            mainCamera.orthographicSize++;
-            once = true;
-        }
-
         if (valueSettingHandler.generateGrid)
         {
             valueSettingHandler.generateGrid = false;
@@ -73,26 +64,21 @@ public class GridManagerAPI : MonoBehaviour
         instantiatePosition = new Vector3(-gridSize / 2, -gridSize / 2, 5);
         Vector3 middlePos = Vector3.zero;
 
-        if (gridElement != null && gridParent != null && tileUIPrefab != null)
+        if (gridElement != null && gridParent != null)
         {
-            for (int i = 0; i < gridSize; i++)
+            for (int x = 0; x < gridSize; x++)
             {
                 for (int y = 0; y < gridSize; y++)
                 {
-                    if (i * gridSize + y >= tileDataList.Count)
+                    if (x * gridSize + y >= tileDataList.Count)
                     {
                         //Create the game objects in the world (Instantiate is like the new Keyword except it creates the gameobject in the world)
                         GameObject ele = Instantiate(gridElement, instantiatePosition, Quaternion.identity, gridParent);
-                        GameObject tileUI = Instantiate(tileUIPrefab);
-
-                        //Initialise the UI
-                        tileUI.transform.SetParent(canvasTransform, false);
-                        tileUI.GetComponent<UIPositionHandler>().SetData(ele.transform, canvasTransform);
-                        //legalMoveUI.GetComponent<UIPositionHandler>().SetUIPosition();
+                        GameObject tileUI = ele.transform.GetChild(0).gameObject;
 
                         //Initialise the Tile by setting its data
                         tileDataList.Add(ele.GetComponent<Tile>());
-                        tileDataList[tileDataList.Count - 1].InitializeTile(i, y, tileUI.GetComponent<UITextHandled>());
+                        tileDataList[tileDataList.Count - 1].InitializeTile(x, y, tileUI.GetComponent<UITextHandled>());
 
                         //Add objects to list for future references.
                         tiles.Add(ele);
@@ -100,13 +86,13 @@ public class GridManagerAPI : MonoBehaviour
                     }
                     else
                     {
-                        int pos = i * gridSize + y;
+                        int pos = x * gridSize + y;
                         tiles[pos].transform.position = instantiatePosition;
                         tiles[pos].SetActive(true);
 
                         tileUIList[pos].SetActive(true);
-
-                        tileDataList[pos].x = i;
+                        
+                        tileDataList[pos].x = x;
                         tileDataList[pos].y = y;
                     }
                     
@@ -114,7 +100,7 @@ public class GridManagerAPI : MonoBehaviour
                     //Move the next instantiated tile a little bit to the left.
                     instantiatePosition.x += 1 + gridElePaddingX;
 
-                    if (i == gridSize / 2 && i == y + 1)
+                    if (x == gridSize / 2 && x == y + 1)
                     {
                         middlePos = instantiatePosition;
                     }
@@ -127,7 +113,6 @@ public class GridManagerAPI : MonoBehaviour
 
             //Adjust main camera position according to the center of the instantiated tiles.
             mainCamera.transform.position = new Vector3(middlePos.x, middlePos.y, mainCamera.transform.position.z);
-            once = false;
             boardGenerated = true;
         }
     }

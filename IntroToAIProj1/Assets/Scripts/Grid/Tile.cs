@@ -28,13 +28,25 @@ public class Tile : MonoBehaviour
         x = posX;
         y = posY;
         tileUI = tileTextComponent;
-        tileUI.SetTextOfTile(numMoves.ToString());
+        if (tileUI)
+        {
+            tileUI.SetTextOfTile(numMoves.ToString());
+        }
+        else
+        {
+            Debug.LogError("TileUI Not SET");
+        }
     }
 
     public int SetNumMoves(int _numMoves)
     {
         numMoves = _numMoves;
         tileUI.SetTextOfTile(numMoves.ToString());
+        return numMoves;
+    }
+
+    public int GetNumMoves()
+    {
         return numMoves;
     }
 }

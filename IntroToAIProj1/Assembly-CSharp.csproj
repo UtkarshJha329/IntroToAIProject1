@@ -67,7 +67,6 @@
     <Compile Include="Assets\Scripts\Grid\BoardDataHandler.cs" />
     <Compile Include="Assets\Scripts\Grid\GridManagerAPI.cs" />
     <Compile Include="Assets\Scripts\Grid\Tile.cs" />
-    <Compile Include="Assets\Scripts\UI\UIPositionHandler.cs" />
     <Compile Include="Assets\Scripts\UI\UITextHandled.cs" />
     <Compile Include="Assets\Scripts\UI\ValueSettingHandler.cs" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />

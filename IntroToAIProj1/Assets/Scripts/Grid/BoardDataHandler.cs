@@ -39,8 +39,8 @@ public class BoardDataHandler : MonoBehaviour
             for (int y = 0; y < gridAPI.GridSize(); y++)
             {
                 //Debug.Log("element: " + (i * gridSize + j));
-                int maxX = gridAPI.GridSize() - x;
-                int maxY = gridAPI.GridSize() - y;
+                int maxX = (x <= gridAPI.GridSize() / 2) ? gridAPI.GridSize() - x : gridAPI.GridSize() - x/2;
+                int maxY = (y <= gridAPI.GridSize() / 2) ? gridAPI.GridSize() - y : gridAPI.GridSize() - y/2;
 
                 //Random function's second parameter is exclusive
                 int randomX = Random.Range(1, maxX);

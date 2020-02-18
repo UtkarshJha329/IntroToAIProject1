@@ -5,31 +5,17 @@ using TMPro;
 
 public class UITextHandled : MonoBehaviour
 {
-    private TextMeshProUGUI text;
-    private float cameraOrthoSize = 0.0f;
+    private TextMeshPro text;
 
     // Start is called before the first frame update
     void Start()
     {
-        text = gameObject.GetComponent<TextMeshProUGUI>();
-        cameraOrthoSize = Camera.main.orthographicSize;
+        text = gameObject.GetComponent<TextMeshPro>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Camera.main.orthographicSize != cameraOrthoSize)
-        {
-            cameraOrthoSize = Camera.main.orthographicSize;
-            if (Input.GetKeyDown(KeyCode.I))
-            {
-                text.fontSize += 2;
-            }
-            else if (Input.GetKeyDown(KeyCode.O))
-            {
-                text.fontSize -= 2;
-            }
-        }
     }
 
     public string Text()
@@ -45,7 +31,7 @@ public class UITextHandled : MonoBehaviour
         }
         else
         {
-            text = gameObject.GetComponent<TextMeshProUGUI>();
+            text = gameObject.GetComponent<TextMeshPro>();
             text.SetText(str);
             //Debug.LogError("Tile Text UI has not been assigned.");
         }
