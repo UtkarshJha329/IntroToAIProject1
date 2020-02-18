@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
-    public int x = 0;
     public int y = 0;
+    public int x = 0;
 
     private int numMoves = 1;
-    private int depth = 0;
-    private UITextHandled tileUI;
+    private int depth = -1;
+    private UITextHandler tileMovesUI;
+    private UITextHandler tileDepthUI;
 
     // Start is called before the first frame update
     void Start()
@@ -23,30 +24,59 @@ public class Tile : MonoBehaviour
         //Debug.Log(/*"x: " + x + "y: " + y + */"Moves count: " + tileUI.Text());
     }
 
-    public void InitializeTile(int posX, int posY, UITextHandled tileTextComponent)
+    public void InitializeTile(int posX, int posY, UITextHandler tileMovesTextComp, UITextHandler tileDepthTextComp)
     {
-        x = posX;
-        y = posY;
-        tileUI = tileTextComponent;
-        if (tileUI)
+        y = posX;
+        x = posY;
+        tileMovesUI = tileMovesTextComp;
+        if (tileMovesUI)
         {
-            tileUI.SetTextOfTile(numMoves.ToString());
+            tileMovesUI.SetTextOfTile(numMoves.ToString());
         }
         else
         {
-            Debug.LogError("TileUI Not SET");
+            Debug.LogError("TileMovesUI Not SET");
+        }
+
+        tileDepthUI = tileDepthTextComp;
+        if (tileDepthUI)
+        {
+            tileMovesUI.SetTextOfTile(depth.ToString());
+        }
+        else
+        {
+            Debug.LogError("TileDepthUI Not SET");
         }
     }
 
     public int SetNumMoves(int _numMoves)
     {
         numMoves = _numMoves;
-        tileUI.SetTextOfTile(numMoves.ToString());
+        if(numMoves != 0)
+        {
+            tileMovesUI.SetTextOfTile(numMoves.ToString());
+        }
+        else
+        {
+            tileMovesUI.SetTextOfTile("G");
+        }
         return numMoves;
+    }
+
+    public int SetTileDepth(int _tileDepth)
+    {
+        depth = _tileDepth;
+        tileDepthUI.SetTextOfTile(depth.ToString());
+        //Debug.Log("Set depth: "+ depth);
+        return depth;
     }
 
     public int GetNumMoves()
     {
         return numMoves;
+    }
+    public int GetTileDepth()
+    {
+        return depth;
     }
 }

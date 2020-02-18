@@ -8,7 +8,6 @@ public class ValueSettingHandler : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI NValueText;
     [SerializeField] private Slider NValueSLider;
-    [SerializeField] private Button GenerateButton;
 
     private int nValue = 5;
     [HideInInspector] public bool generateGrid = false;

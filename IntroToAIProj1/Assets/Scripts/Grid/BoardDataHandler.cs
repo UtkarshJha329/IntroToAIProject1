@@ -26,8 +26,14 @@ public class BoardDataHandler : MonoBehaviour
     {
         if(gridAPI.boardGenerated == true)
         {
+            gridAPI.ResetValues();
+
             //PART 2 OF PROJECT
             SetRandomLegalTileMove();
+
+            //PART 3 OF PROJECT
+            CalculateDepthForEachTile();
+            
             gridAPI.boardGenerated = false;
         }
     }
@@ -57,6 +63,82 @@ public class BoardDataHandler : MonoBehaviour
                 }
             }
         }
+        gridAPI.GetGoalTile().SetNumMoves(0);
     }
 
+    private void CalculateDepthForEachTile()
+    {
+        Queue<Tile> nextLookAtTile = new Queue<Tile>();
+
+        gridAPI.GetStartTile().SetTileDepth(0);
+        nextLookAtTile.Enqueue(gridAPI.GetStartTile());
+        
+        Tile dequeTile;
+
+        while (nextLookAtTile.Count > 0)
+        {
+            dequeTile = nextLookAtTile.Dequeue();
+
+            List<Tile> inRangeTiles = GetInRangeTiles(dequeTile);
+            //Debug.Log(inRangeTiles.Count);
+            
+            for (int i = 0; i < inRangeTiles.Count; i++)
+            {
+                if(inRangeTiles[i].GetTileDepth() == -1)
+                {
+                    inRangeTiles[i].SetTileDepth(dequeTile.GetTileDepth() + 1);
+                    nextLookAtTile.Enqueue(inRangeTiles[i]);
+                    //Debug.Log(inRangeTiles[i].x + ", " + inRangeTiles[i].y);
+                }
+            }
+        }
+    }
+
+    private List<Tile> GetInRangeTiles(Tile tile)
+    {
+        List<Tile> returnTiles = new List<Tile>();
+        int numMoves = tile.GetNumMoves();
+
+        Tile tileToAdd;
+
+        if(tile.y - numMoves >= 0)
+        {
+            tileToAdd = gridAPI.GetTileByCoord(tile.y - numMoves, tile.x);
+            //Debug.Log("TileValue: " + tileToAdd.GetNumMoves() + "TileDepth Down: " + tileToAdd.GetTileDepth());
+            if(tileToAdd.GetTileDepth() < 0)
+            {
+                returnTiles.Add(tileToAdd);
+            }
+        }
+        if(tile.y + numMoves < gridAPI.GridSize())
+        {
+            tileToAdd = gridAPI.GetTileByCoord(tile.y + numMoves, tile.x);
+            //Debug.Log("TileValue: " + tileToAdd.GetNumMoves() + "TileDepth Up: " + tileToAdd.GetTileDepth());
+            if (tileToAdd.GetTileDepth() < 0)
+            {
+                returnTiles.Add(tileToAdd);
+            }
+        }
+
+        if (tile.x - numMoves >= 0)
+        {
+            tileToAdd = gridAPI.GetTileByCoord(tile.y, tile.x - numMoves);
+            //Debug.Log("TileValue: " + tileToAdd.GetNumMoves() + "TileDepth left: " + tileToAdd.GetTileDepth());
+            if (tileToAdd.GetTileDepth() < 0)
+            {
+                returnTiles.Add(tileToAdd);
+            }
+        }
+        if (tile.x + numMoves < gridAPI.GridSize())
+        {
+            tileToAdd = gridAPI.GetTileByCoord(tile.y, tile.x + numMoves);
+            //Debug.Log("TileValue: " + tileToAdd.GetNumMoves() + "TileDepth Right: " + tileToAdd.GetTileDepth());
+            if (tileToAdd.GetTileDepth() < 0)
+            {
+                returnTiles.Add(tileToAdd);
+            }
+        }
+
+        return returnTiles;
+    }
 }

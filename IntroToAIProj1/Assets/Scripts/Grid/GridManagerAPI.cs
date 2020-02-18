@@ -8,7 +8,7 @@ public class GridManagerAPI : MonoBehaviour
     private Camera mainCamera;
 
     //GridSize (As the grid is always a square this will define how big one side is)
-    [SerializeField] private int gridSize = 5;
+    private int gridSize = 5;
     //Returns GridSize
     public int GridSize()
     {
@@ -29,12 +29,21 @@ public class GridManagerAPI : MonoBehaviour
 
     //Lists will hold references to each individual tile
     private static List<GameObject> tiles = new List<GameObject>();
-    private static List<GameObject> tileUIList = new List<GameObject>();
+    //private static List<GameObject> tileMovesUIList = new List<GameObject>();
+    //private static List<GameObject> tileDepthUIList = new List<GameObject>();
     public static List<Tile> tileDataList = new List<Tile>();
 
     private Vector3 instantiatePosition = Vector3.zero;
 
-    public bool boardGenerated = false;
+    [HideInInspector] public bool boardGenerated = false;
+
+    public Color gridElementColour;
+    public Color gridStartElementColour;
+    public Color gridGoalElementColour;
+
+    private Vector2Int startTileCoord = new Vector2Int(0, 0);
+    private Vector2Int goalTileCoords = new Vector2Int(0, 0);
+
     // Start is called before the first frame update
     void Start()
     {
@@ -70,32 +79,37 @@ public class GridManagerAPI : MonoBehaviour
             {
                 for (int y = 0; y < gridSize; y++)
                 {
+                    int pos = x * gridSize + y;
+                    
                     if (x * gridSize + y >= tileDataList.Count)
                     {
                         //Create the game objects in the world (Instantiate is like the new Keyword except it creates the gameobject in the world)
                         GameObject ele = Instantiate(gridElement, instantiatePosition, Quaternion.identity, gridParent);
-                        GameObject tileUI = ele.transform.GetChild(0).gameObject;
+                        GameObject tileMovesUI = ele.transform.GetChild(0).gameObject;
+                        GameObject tileDepthUI = ele.transform.GetChild(1).gameObject;
 
                         //Initialise the Tile by setting its data
                         tileDataList.Add(ele.GetComponent<Tile>());
-                        tileDataList[tileDataList.Count - 1].InitializeTile(x, y, tileUI.GetComponent<UITextHandled>());
+                        tileDataList[tileDataList.Count - 1].InitializeTile(x, y, tileMovesUI.GetComponent<UITextHandler>(), tileDepthUI.GetComponent<UITextHandler>());
 
                         //Add objects to list for future references.
                         tiles.Add(ele);
-                        tileUIList.Add(tileUI);
+                        //tileMovesUIList.Add(tileMovesUI);
                     }
                     else
                     {
-                        int pos = x * gridSize + y;
                         tiles[pos].transform.position = instantiatePosition;
                         tiles[pos].SetActive(true);
 
-                        tileUIList[pos].SetActive(true);
+                        //tileMovesUIList[pos].SetActive(true);
                         
-                        tileDataList[pos].x = x;
-                        tileDataList[pos].y = y;
+                        tileDataList[pos].y = x;
+                        tileDataList[pos].x = y;
+                        tileDataList[pos].SetNumMoves(0);
+                        tileDataList[pos].SetTileDepth(-1);
                     }
-                    
+
+                    SetTileColour(pos, x, y);
 
                     //Move the next instantiated tile a little bit to the left.
                     instantiatePosition.x += 1 + gridElePaddingX;
@@ -121,6 +135,16 @@ public class GridManagerAPI : MonoBehaviour
     {
         return tileDataList[x * gridSize + y];
     }
+
+    public Tile GetStartTile()
+    {
+        return GetTileByCoord(startTileCoord.x, startTileCoord.y);
+    }
+    public Tile GetGoalTile()
+    {
+        return GetTileByCoord(goalTileCoords.x, goalTileCoords.y);
+    }
+
     public void SetNumMovesForTile(int x, int y, int numMoves)
     {
         tileDataList[x * gridSize + y].SetNumMoves(numMoves);
@@ -131,7 +155,37 @@ public class GridManagerAPI : MonoBehaviour
         for (int i = 0; i < tileDataList.Count; i++)
         {
             tiles[i].SetActive(false);
-            tileUIList[i].SetActive(false);
+            tileDataList[i].SetTileDepth(-1);
+            //tileMovesUIList[i].SetActive(false);
+        }
+    }
+
+    public void ResetValues()
+    {
+        for (int i = 0; i < tileDataList.Count; i++)
+        {
+            tileDataList[i].SetTileDepth(-1);
+        }
+
+    }
+
+    private void SetTileColour(int pos, int x, int y)
+    {
+        if (pos == gridSize - 1)
+        {
+            tiles[pos].GetComponent<SpriteRenderer>().color = gridGoalElementColour;
+            goalTileCoords.x = x;
+            goalTileCoords.y = y;
+        }
+        else if (pos == gridSize * (gridSize - 1))
+        {
+            tiles[pos].GetComponent<SpriteRenderer>().color = gridStartElementColour;
+            startTileCoord.x = x;
+            startTileCoord.y = y;
+        }
+        else
+        {
+            tiles[pos].GetComponent<SpriteRenderer>().color = gridElementColour;
         }
     }
 }

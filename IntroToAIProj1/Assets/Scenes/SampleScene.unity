@@ -236,7 +236,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NValueText: {fileID: 311438961}
   NValueSLider: {fileID: 1109263190}
-  GenerateButton: {fileID: 0}
   generateGrid: 0
 --- !u!1 &205069166
 GameObject:
@@ -381,7 +380,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 130, y: -160}
+  m_AnchoredPosition: {x: 98, y: -162}
   m_SizeDelta: {x: 160, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &311438961
@@ -775,10 +774,11 @@ MonoBehaviour:
   gridElement: {fileID: 1172999967052096259, guid: fbc3c251be9f7f147b2497e72e74caa3,
     type: 3}
   gridParent: {fileID: 876793682}
-  tileUIPrefab: {fileID: 8757367760254242413, guid: 2600c96749b0b6544863f84a48a12d4e,
-    type: 3}
   canvasTransform: {fileID: 142789661}
   boardGenerated: 0
+  gridElementColour: {r: 0, g: 0.54918915, b: 0.745283, a: 1}
+  gridStartElementColour: {r: 1, g: 0.19260524, b: 0.015686274, a: 1}
+  gridGoalElementColour: {r: 0.4930031, g: 1, b: 0.015686274, a: 1}
 --- !u!4 &876793682
 Transform:
   m_ObjectHideFlags: 0
@@ -938,7 +938,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 130, y: -204}
+  m_AnchoredPosition: {x: 98, y: -206}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1109263190
@@ -1093,7 +1093,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 130, y: -229}
+  m_AnchoredPosition: {x: 98, y: -231}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1855162392

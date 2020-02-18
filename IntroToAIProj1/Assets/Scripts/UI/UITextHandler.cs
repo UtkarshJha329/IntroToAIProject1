@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class UITextHandled : MonoBehaviour
+public class UITextHandler : MonoBehaviour
 {
     private TextMeshPro text;
 
