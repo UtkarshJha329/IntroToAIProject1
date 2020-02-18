@@ -132,6 +132,10 @@ public class GridManagerAPI : MonoBehaviour
         }
     }
 
+    public Tile GetTileByCoord(int x, int y)
+    {
+        return tileDataList[x * gridSize + y];
+    }
     public void SetNumMovesForTile(int x, int y, int numMoves)
     {
         tileDataList[x * gridSize + y].SetNumMoves(numMoves);
