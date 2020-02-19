@@ -12,6 +12,26 @@ public class Tile : MonoBehaviour
     private UITextHandler tileMovesUI;
     private UITextHandler tileDepthUI;
 
+    public Tile()
+    {
+        x = 0;
+        y = 0;
+        numMoves = 1;
+        depth = -1;
+        tileMovesUI = null;
+        tileDepthUI = null;
+    }
+
+    public Tile(int posX, int posY, UITextHandler tileMovesTextComp, UITextHandler tileDepthTextComp)
+    {
+        InitializeTile(posX, posY, tileMovesTextComp, tileDepthTextComp);
+    }
+
+    public Tile(Tile tileToCopy)
+    {
+        InitializeTile(tileToCopy.x, tileToCopy.y, tileToCopy.GetTileMovesUI(), tileToCopy.GetTileDepthUI());
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -78,5 +98,13 @@ public class Tile : MonoBehaviour
     public int GetTileDepth()
     {
         return depth;
+    }
+    public UITextHandler GetTileMovesUI()
+    {
+        return tileMovesUI;
+    }
+    public UITextHandler GetTileDepthUI()
+    {
+        return tileDepthUI;
     }
 }

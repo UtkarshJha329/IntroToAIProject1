@@ -35,7 +35,10 @@ public class GridManagerAPI : MonoBehaviour
 
     private Vector3 instantiatePosition = Vector3.zero;
 
+    [HideInInspector] public bool generateBoard = false;
     [HideInInspector] public bool boardGenerated = false;
+    [HideInInspector] public bool doHillClimb = false;
+    [HideInInspector] public int hilClimbNumIter = 100;
 
     public Color gridElementColour;
     public Color gridStartElementColour;
@@ -58,6 +61,13 @@ public class GridManagerAPI : MonoBehaviour
             valueSettingHandler.generateGrid = false;
             CreateGrid_WithUI_InScene();
         }
+
+        if (valueSettingHandler.doHillClimb)
+        {
+            doHillClimb = true;
+            valueSettingHandler.doHillClimb = false;
+        }
+        hilClimbNumIter = valueSettingHandler.HillClmbItterVal();
     }
 
     public void CreateGrid_WithUI_InScene()
@@ -128,6 +138,7 @@ public class GridManagerAPI : MonoBehaviour
             //Adjust main camera position according to the center of the instantiated tiles.
             mainCamera.transform.position = new Vector3(middlePos.x, middlePos.y, mainCamera.transform.position.z);
             boardGenerated = true;
+            generateBoard = true;
         }
     }
 
@@ -145,28 +156,30 @@ public class GridManagerAPI : MonoBehaviour
         return GetTileByCoord(goalTileCoords.x, goalTileCoords.y);
     }
 
+    public Tile GetCopyOfTile(Tile tileToCopy)
+    {
+        Tile copiedTile = new Tile(tileToCopy);
+
+        return copiedTile;
+    }
+
     public void SetNumMovesForTile(int x, int y, int numMoves)
     {
         tileDataList[x * gridSize + y].SetNumMoves(numMoves);
     }
 
-    private void DeactivateAllObjects()
+    public int CurNumTiles()
     {
-        for (int i = 0; i < tileDataList.Count; i++)
-        {
-            tiles[i].SetActive(false);
-            tileDataList[i].SetTileDepth(-1);
-            //tileMovesUIList[i].SetActive(false);
-        }
+        return gridSize * gridSize;
     }
 
-    public void ResetValues()
+    public bool ResetDepthValues()
     {
         for (int i = 0; i < tileDataList.Count; i++)
         {
             tileDataList[i].SetTileDepth(-1);
         }
-
+        return true;
     }
 
     private void SetTileColour(int pos, int x, int y)
@@ -186,6 +199,16 @@ public class GridManagerAPI : MonoBehaviour
         else
         {
             tiles[pos].GetComponent<SpriteRenderer>().color = gridElementColour;
+        }
+    }
+
+    private void DeactivateAllObjects()
+    {
+        for (int i = 0; i < tileDataList.Count; i++)
+        {
+            tiles[i].SetActive(false);
+            tileDataList[i].SetTileDepth(-1);
+            //tileMovesUIList[i].SetActive(false);
         }
     }
 }

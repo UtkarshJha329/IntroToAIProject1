@@ -8,9 +8,13 @@ public class ValueSettingHandler : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI NValueText;
     [SerializeField] private Slider NValueSLider;
+    [SerializeField] private TextMeshProUGUI HillClimbValueText;
+    [SerializeField] private Slider HillClimbSlider;
 
     private int nValue = 5;
+    private int hillClimbItterationValue = 5;
     [HideInInspector] public bool generateGrid = false;
+    [HideInInspector] public bool doHillClimb = false;
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +31,7 @@ public class ValueSettingHandler : MonoBehaviour
     void Update()
     {
         NValue();
+        HillClmbItterVal();
     }
 
     public int NValue()
@@ -50,13 +55,29 @@ public class ValueSettingHandler : MonoBehaviour
                 NValueText.SetText("N value: 11");
                 nValue = 11;
                 break;
+            //case 5:
+            //    NValueText.SetText("N value: 111");
+            //    nValue = 111;
+            //    break;
 
         }
         return nValue;
     }
 
+    public int HillClmbItterVal()
+    {
+        int retVal = (int)HillClimbSlider.value * 100;
+        HillClimbValueText.SetText("Num Itter: " + retVal);
+        return retVal;
+    }
+
     public void Generate()
     {
         generateGrid = true;
+    }
+
+    public void DoHillClimb()
+    {
+        doHillClimb = true;
     }
 }
