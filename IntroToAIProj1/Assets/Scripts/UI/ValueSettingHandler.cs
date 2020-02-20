@@ -10,11 +10,13 @@ public class ValueSettingHandler : MonoBehaviour
     [SerializeField] private Slider NValueSLider;
     [SerializeField] private TextMeshProUGUI HillClimbValueText;
     [SerializeField] private Slider HillClimbSlider;
+    [SerializeField] private TextMeshProUGUI TimerText;
 
     private int nValue = 5;
-    private int hillClimbItterationValue = 5;
     [HideInInspector] public bool generateGrid = false;
     [HideInInspector] public bool doHillClimb = false;
+    [HideInInspector] public bool doSPF = false;
+    [HideInInspector] public bool doAStar = false;
 
     // Start is called before the first frame update
     void Start()
@@ -79,5 +81,20 @@ public class ValueSettingHandler : MonoBehaviour
     public void DoHillClimb()
     {
         doHillClimb = true;
+    }
+
+    public void DoSPF()
+    {
+        doSPF = true;
+    }
+
+    public void DoAStar()
+    {
+        doAStar = true;
+    }
+
+    public void SetTimerText(string _timerText)
+    {
+        TimerText.SetText(_timerText);
     }
 }

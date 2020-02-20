@@ -38,6 +38,8 @@ public class GridManagerAPI : MonoBehaviour
     [HideInInspector] public bool generateBoard = false;
     [HideInInspector] public bool boardGenerated = false;
     [HideInInspector] public bool doHillClimb = false;
+    [HideInInspector] public bool doSPF = false;
+    [HideInInspector] public bool doAStar = false;
     [HideInInspector] public int hilClimbNumIter = 100;
 
     public Color gridElementColour;
@@ -68,6 +70,19 @@ public class GridManagerAPI : MonoBehaviour
             valueSettingHandler.doHillClimb = false;
         }
         hilClimbNumIter = valueSettingHandler.HillClmbItterVal();
+
+        if (valueSettingHandler.doSPF)
+        {
+            doSPF = true;
+            valueSettingHandler.doSPF = false;
+        }
+
+        if (valueSettingHandler.doAStar)
+        {
+            doAStar = true;
+            valueSettingHandler.doAStar = false;
+        }
+
     }
 
     public void CreateGrid_WithUI_InScene()
@@ -97,10 +112,11 @@ public class GridManagerAPI : MonoBehaviour
                         GameObject ele = Instantiate(gridElement, instantiatePosition, Quaternion.identity, gridParent);
                         GameObject tileMovesUI = ele.transform.GetChild(0).gameObject;
                         GameObject tileDepthUI = ele.transform.GetChild(1).gameObject;
+                        GameObject tileSpfVUI = ele.transform.GetChild(2).gameObject;
 
                         //Initialise the Tile by setting its data
                         tileDataList.Add(ele.GetComponent<Tile>());
-                        tileDataList[tileDataList.Count - 1].InitializeTile(x, y, tileMovesUI.GetComponent<UITextHandler>(), tileDepthUI.GetComponent<UITextHandler>());
+                        tileDataList[tileDataList.Count - 1].InitializeTile(x, y, tileMovesUI.GetComponent<UITextHandler>(), tileDepthUI.GetComponent<UITextHandler>(), tileSpfVUI.GetComponent<UITextHandler>());
 
                         //Add objects to list for future references.
                         tiles.Add(ele);
@@ -117,6 +133,7 @@ public class GridManagerAPI : MonoBehaviour
                         tileDataList[pos].x = y;
                         tileDataList[pos].SetNumMoves(0);
                         tileDataList[pos].SetTileDepth(-1);
+                        tileDataList[pos].SetSpfValue(-1);
                     }
 
                     SetTileColour(pos, x, y);
@@ -180,6 +197,31 @@ public class GridManagerAPI : MonoBehaviour
             tileDataList[i].SetTileDepth(-1);
         }
         return true;
+    }
+
+    public bool ResetSpfRValues()
+    {
+        for (int i = 0; i < tileDataList.Count; i++)
+        {
+            tileDataList[i].SetSpfValue(-1);
+            tileDataList[i].visited = 0;
+        }
+        return true;
+    }
+
+    public bool ResetAStarValues()
+    {
+        for (int i = 0; i < tileDataList.Count; i++)
+        {
+            tileDataList[i].SetAStarValue(-1, 0);
+            tileDataList[i].visited = 0;
+        }
+        return true;
+    }
+
+    public void SetTimerText(string timerText)
+    {
+        valueSettingHandler.SetTimerText(timerText);
     }
 
     private void SetTileColour(int pos, int x, int y)
