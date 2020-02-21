@@ -37,6 +37,7 @@ public class GridManagerAPI : MonoBehaviour
 
     [HideInInspector] public bool generateBoard = false;
     [HideInInspector] public bool boardGenerated = false;
+    [HideInInspector] public bool doBFS = false;
     [HideInInspector] public bool doHillClimb = false;
     [HideInInspector] public bool doSPF = false;
     [HideInInspector] public bool doAStar = false;
@@ -62,6 +63,12 @@ public class GridManagerAPI : MonoBehaviour
         {
             valueSettingHandler.generateGrid = false;
             CreateGrid_WithUI_InScene();
+        }
+
+        if (valueSettingHandler.doBFS)
+        {
+            doBFS = true;
+            valueSettingHandler.doBFS = false;
         }
 
         if (valueSettingHandler.doHillClimb)
@@ -116,7 +123,7 @@ public class GridManagerAPI : MonoBehaviour
 
                         //Initialise the Tile by setting its data
                         tileDataList.Add(ele.GetComponent<Tile>());
-                        tileDataList[tileDataList.Count - 1].InitializeTile(x, y, tileMovesUI.GetComponent<UITextHandler>(), tileDepthUI.GetComponent<UITextHandler>(), tileSpfVUI.GetComponent<UITextHandler>());
+                        tileDataList[tileDataList.Count - 1].InitializeTile(x, y, tileMovesUI.GetComponent<UITextHandler>(), tileDepthUI.GetComponent<UITextHandler>(), tileSpfVUI.GetComponent<UITextHandler>(), ele.GetComponent<SpriteRenderer>());
 
                         //Add objects to list for future references.
                         tiles.Add(ele);
@@ -194,6 +201,7 @@ public class GridManagerAPI : MonoBehaviour
     {
         for (int i = 0; i < tileDataList.Count; i++)
         {
+            tileDataList[i].pfParent = null;
             tileDataList[i].SetTileDepth(-1);
         }
         return true;
@@ -213,8 +221,10 @@ public class GridManagerAPI : MonoBehaviour
     {
         for (int i = 0; i < tileDataList.Count; i++)
         {
+            tileDataList[i].pfParent = null;
             tileDataList[i].SetAStarValue(-1, 0);
             tileDataList[i].visited = 0;
+            tileDataList[i].inAStarList = 0;
         }
         return true;
     }
@@ -224,23 +234,50 @@ public class GridManagerAPI : MonoBehaviour
         valueSettingHandler.SetTimerText(timerText);
     }
 
+    public void ResetTileColours()
+    {
+        int x = 0;
+        int y = 0;
+        int pos = y * gridSize + x;
+        for (x = 0; x < gridSize; x++)
+        {
+            for (y = 0; y < gridSize; y++)
+            {
+                pos = x * gridSize + y;
+                if (pos == gridSize - 1)
+                {
+                    tileDataList[pos].SetSpriteColor(gridGoalElementColour);
+                }
+                else if (pos == gridSize * (gridSize - 1))
+                {
+                    tileDataList[pos].SetSpriteColor(gridStartElementColour);
+                }
+                else
+                {
+                    tileDataList[pos].SetSpriteColor(gridElementColour);
+                }
+            }
+        }
+        
+    }
+
     private void SetTileColour(int pos, int x, int y)
     {
         if (pos == gridSize - 1)
         {
-            tiles[pos].GetComponent<SpriteRenderer>().color = gridGoalElementColour;
+            tileDataList[pos].SetSpriteColor(gridGoalElementColour);
             goalTileCoords.x = x;
             goalTileCoords.y = y;
         }
         else if (pos == gridSize * (gridSize - 1))
         {
-            tiles[pos].GetComponent<SpriteRenderer>().color = gridStartElementColour;
+            tileDataList[pos].SetSpriteColor(gridStartElementColour);
             startTileCoord.x = x;
             startTileCoord.y = y;
         }
         else
         {
-            tiles[pos].GetComponent<SpriteRenderer>().color = gridElementColour;
+            tileDataList[pos].SetSpriteColor(gridElementColour);
         }
     }
 

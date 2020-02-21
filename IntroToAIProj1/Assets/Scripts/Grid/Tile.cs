@@ -8,6 +8,7 @@ public class Tile : MonoBehaviour
     public int x = 0;
 
     [HideInInspector] public int visited = 0;
+    [HideInInspector] public Tile pfParent;
 
     private int numMoves = 1;
     private int depth = -1;
@@ -15,10 +16,12 @@ public class Tile : MonoBehaviour
     private int aStarFV = -1;
     private int aStarHV = -1;
     private int aStarGV = -1;
-
+    [HideInInspector] public int inAStarList = 0;
     private UITextHandler tileMovesUI;
     private UITextHandler tileDepthUI;
     private UITextHandler tileSpfVUI;
+
+    private SpriteRenderer tileSprite;
 
     public Tile()
     {
@@ -31,14 +34,14 @@ public class Tile : MonoBehaviour
         tileDepthUI = null;
     }
 
-    public Tile(int posX, int posY, UITextHandler tileMovesTextComp, UITextHandler tileDepthTextComp, UITextHandler tileSpfVTextComp)
+    public Tile(int posX, int posY, UITextHandler tileMovesTextComp, UITextHandler tileDepthTextComp, UITextHandler tileSpfVTextComp, SpriteRenderer tileSprite)
     {
-        InitializeTile(posX, posY, tileMovesTextComp, tileDepthTextComp, tileSpfVTextComp);
+        InitializeTile(posX, posY, tileMovesTextComp, tileDepthTextComp, tileSpfVTextComp, tileSprite);
     }
 
     public Tile(Tile tileToCopy)
     {
-        InitializeTile(tileToCopy.x, tileToCopy.y, tileToCopy.GetTileMovesUI(), tileToCopy.GetTileDepthUI(), tileToCopy.GetTileSpfVUI());
+        InitializeTile(tileToCopy.x, tileToCopy.y, tileToCopy.GetTileMovesUI(), tileToCopy.GetTileDepthUI(), tileToCopy.GetTileSpfVUI(), tileToCopy.tileSprite);
     }
 
     // Start is called before the first frame update
@@ -53,11 +56,12 @@ public class Tile : MonoBehaviour
         //Debug.Log(/*"x: " + x + "y: " + y + */"Moves count: " + tileUI.Text());
     }
 
-    public void InitializeTile(int posX, int posY, UITextHandler tileMovesTextComp, UITextHandler tileDepthTextComp, UITextHandler tileSpfVTextComp)
+    public void InitializeTile(int posX, int posY, UITextHandler tileMovesTextComp, UITextHandler tileDepthTextComp, UITextHandler tileSpfVTextComp, SpriteRenderer _tileSprite)
     {
         y = posX;
         x = posY;
         tileMovesUI = tileMovesTextComp;
+        tileSprite = _tileSprite;
         if (tileMovesUI)
         {
             tileMovesUI.SetTextOfTile(numMoves.ToString());
@@ -117,6 +121,13 @@ public class Tile : MonoBehaviour
         //Debug.Log("Set depth: "+ depth);
         return spfV;
     }
+    public void SetAStarValue(int _aStarF)
+    {
+        aStarFV = _aStarF;
+        aStarGV = aStarFV + aStarHV;
+        tileSpfVUI.SetTextOfTile(aStarFV.ToString());
+        //Debug.Log("Set depth: "+ depth);
+    }
 
     public void SetAStarValue(int _aStarF, int _aStarH)
     {
@@ -163,5 +174,15 @@ public class Tile : MonoBehaviour
     public UITextHandler GetTileSpfVUI()
     {
         return tileSpfVUI;
+    }
+
+    public SpriteRenderer GetSprite()
+    {
+        return tileSprite;
+    }
+
+    public void SetSpriteColor(Color color)
+    {
+        tileSprite.color = color;
     }
 }

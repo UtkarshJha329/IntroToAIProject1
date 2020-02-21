@@ -14,6 +14,7 @@ public class ValueSettingHandler : MonoBehaviour
 
     private int nValue = 5;
     [HideInInspector] public bool generateGrid = false;
+    [HideInInspector] public bool doBFS = false;
     [HideInInspector] public bool doHillClimb = false;
     [HideInInspector] public bool doSPF = false;
     [HideInInspector] public bool doAStar = false;
@@ -57,10 +58,26 @@ public class ValueSettingHandler : MonoBehaviour
                 NValueText.SetText("N value: 11");
                 nValue = 11;
                 break;
-            //case 5:
-            //    NValueText.SetText("N value: 111");
-            //    nValue = 111;
-            //    break;
+            case 5:
+                NValueText.SetText("N value: 55");
+                nValue = 55;
+                break;
+            case 6:
+                NValueText.SetText("N value: 66");
+                nValue = 66;
+                break;
+            case 7:
+                NValueText.SetText("N value: 77");
+                nValue = 77;
+                break;
+            case 8:
+                NValueText.SetText("N value: 88");
+                nValue = 88;
+                break;
+            case 9:
+                NValueText.SetText("N value: 99");
+                nValue = 99;
+                break;
 
         }
         return nValue;
@@ -75,7 +92,26 @@ public class ValueSettingHandler : MonoBehaviour
 
     public void Generate()
     {
-        generateGrid = true;
+        if(nValue >= 55)
+        {
+            if (Input.GetKey(KeyCode.LeftControl))
+            {
+                generateGrid = true;
+            }
+            else
+            {
+                generateGrid = false;
+            }
+        }
+        else
+        {
+            generateGrid = true;
+        }
+    }
+
+    public void DoBFS()
+    {
+        doBFS = true;
     }
 
     public void DoHillClimb()

@@ -7,7 +7,14 @@ public class BoardDataHandler : MonoBehaviour
     public GameObject gridSceneObject;
     private GridManagerAPI gridAPI;
 
+    public Color pathColor;
+
     private TimeKeeper stopwatch;
+    private bool newPf = false;
+    private int TValueToChoose = 0;
+
+    private Tile curPTile;
+    private float lerpValue = 1.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -30,10 +37,10 @@ public class BoardDataHandler : MonoBehaviour
     {
         if(gridAPI.generateBoard && gridAPI.boardGenerated)
         {
-            stopwatch.Start();
             if (gridAPI.ResetDepthValues())
             {
-                    //PART 2 OF PROJECT
+                //PART 2 OF PROJECT
+                stopwatch.Start();
                 if (SetLegalMovesForAllTiles())
                 {
                     //PART 3 OF PROJECT
@@ -41,6 +48,10 @@ public class BoardDataHandler : MonoBehaviour
                     {
                         //Debug.Log("Created Board With Initial Values");
                         gridAPI.SetTimerText(stopwatch.Stop());
+                        newPf = true;
+                        TValueToChoose = 0;
+                        curPTile = gridAPI.GetGoalTile();
+                        lerpValue = 1.0f;
                     }
                     else
                     {
@@ -64,14 +75,42 @@ public class BoardDataHandler : MonoBehaviour
             gridAPI.generateBoard = false;
         }
 
+        //Just separated BFS to see how it performs
+        if (gridAPI.boardGenerated && gridAPI.doBFS)
+        {
+            gridAPI.ResetDepthValues();
+            stopwatch.Start();
+            if (BFS())
+            {
+                gridAPI.doBFS = false;
+                gridAPI.SetTimerText(stopwatch.Stop());
+                newPf = true;
+                gridAPI.ResetTileColours();
+                TValueToChoose = 0;
+                curPTile = gridAPI.GetGoalTile();
+                lerpValue = 1.0f;
+            }
+            else
+            {
+                stopwatch.Stop();
+                gridAPI.SetTimerText("Failed");
+            }
+        }
+
         //PART 4 Of The Project
         if (gridAPI.boardGenerated && gridAPI.doHillClimb)
         {
+            gridAPI.ResetDepthValues();
             stopwatch.Start();
             if (HillClimb(gridAPI.hilClimbNumIter))
             {
                 gridAPI.doHillClimb = false;
                 gridAPI.SetTimerText(stopwatch.Stop());
+                gridAPI.ResetTileColours();
+                newPf = true;
+                TValueToChoose = 0;
+                curPTile = gridAPI.GetGoalTile();
+                lerpValue = 1.0f;
             }
             else
             {
@@ -84,11 +123,17 @@ public class BoardDataHandler : MonoBehaviour
         //PART 5 Of The Project
         if (gridAPI.boardGenerated && gridAPI.doSPF)
         {
+            gridAPI.ResetSpfRValues();
             stopwatch.Start();
-            if(gridAPI.ResetSpfRValues() && ShortestPathFirst())
+            if(ShortestPathFirst())
             {
                 gridAPI.doSPF = false;
                 gridAPI.SetTimerText(stopwatch.Stop());
+                newPf = true;
+                gridAPI.ResetTileColours();
+                TValueToChoose = 1;
+                curPTile = gridAPI.GetGoalTile();
+                lerpValue = 1.0f;
             }
             else
             {
@@ -100,16 +145,54 @@ public class BoardDataHandler : MonoBehaviour
         //PART 6 Of The Project
         if (gridAPI.boardGenerated && gridAPI.doAStar)
         {
+            gridAPI.ResetAStarValues();
             stopwatch.Start();
-            if (gridAPI.ResetAStarValues() && AStar())
+            if (AStar())
             {
                 gridAPI.doAStar = false;
                 gridAPI.SetTimerText(stopwatch.Stop());
+                newPf = true;
+                gridAPI.ResetTileColours();
+                TValueToChoose = 2;
+                curPTile = gridAPI.GetGoalTile();
+                lerpValue = 1.0f;
             }
             else
             {
                 stopwatch.Stop();
                 gridAPI.SetTimerText("Failed");
+            }
+        }
+
+        
+        if (newPf && Input.GetMouseButton(0))
+        {
+            if(curPTile.pfParent != null && curPTile.pfParent != gridAPI.GetStartTile())
+            {
+                if(TValueToChoose == 0)
+                {
+                    lerpValue -= 1.0f / gridAPI.GetGoalTile().GetTileDepth();
+                    curPTile.pfParent.SetSpriteColor(Color.Lerp(gridAPI.gridStartElementColour,
+                        gridAPI.gridGoalElementColour,
+                        lerpValue));
+                }
+                else if (TValueToChoose == 1)
+                {
+                    lerpValue -= 1.0f / gridAPI.GetGoalTile().GetSpfValue();
+
+                    curPTile.pfParent.SetSpriteColor(Color.Lerp(gridAPI.gridStartElementColour,
+                        gridAPI.gridGoalElementColour,
+                        lerpValue));
+                }
+                else if (TValueToChoose == 2)
+                {
+                    lerpValue -= 1.0f / gridAPI.GetGoalTile().GetAStarFV();
+
+                    curPTile.pfParent.SetSpriteColor(Color.Lerp(gridAPI.gridStartElementColour,
+                        gridAPI.gridGoalElementColour,
+                        lerpValue));
+                }
+                curPTile = curPTile.pfParent;
             }
         }
     }
@@ -178,10 +261,19 @@ public class BoardDataHandler : MonoBehaviour
                     {
                         inRangeTiles[i].SetTileDepth(dequeTile.GetTileDepth() + 1);
                         numTilesVisited++;
+                        inRangeTiles[i].pfParent = dequeTile;
                         nextLookAtTile.Enqueue(inRangeTiles[i]);
+                        if(inRangeTiles[i] == gridAPI.GetGoalTile())
+                        {
+                            break;
+                        }
                         //Debug.Log(inRangeTiles[i].x + ", " + inRangeTiles[i].y);
                     }
                 }
+            }
+            else
+            {
+                break;
             }
         }
 
@@ -190,6 +282,54 @@ public class BoardDataHandler : MonoBehaviour
             gridAPI.GetGoalTile().SetTileDepth(-(gridAPI.CurNumTiles() - numTilesVisited));
         }
 
+        return true;
+    }
+
+    private bool BFS()
+    {
+        Queue<Tile> nextLookAtTile = new Queue<Tile>();
+
+        gridAPI.GetStartTile().SetTileDepth(0);
+        nextLookAtTile.Enqueue(gridAPI.GetStartTile());
+        int numTilesVisited = 1;
+
+        Tile dequeTile;
+
+        while (nextLookAtTile.Count > 0)
+        {
+            dequeTile = nextLookAtTile.Dequeue();
+
+            if (dequeTile != gridAPI.GetGoalTile())
+            {
+                List<Tile> inRangeTiles = GetInRangeTiles(dequeTile, 0);
+                //Debug.Log(inRangeTiles.Count);
+                for (int i = 0; i < inRangeTiles.Count; i++)
+                {
+                    if (inRangeTiles[i].GetTileDepth() == -1)
+                    {
+                        inRangeTiles[i].SetTileDepth(dequeTile.GetTileDepth() + 1);
+                        numTilesVisited++;
+                        inRangeTiles[i].pfParent = dequeTile;
+                        nextLookAtTile.Enqueue(inRangeTiles[i]);
+                        if (inRangeTiles[i] == gridAPI.GetGoalTile())
+                        {
+                            break;
+                        }
+                        //Debug.Log(inRangeTiles[i].x + ", " + inRangeTiles[i].y);
+                    }
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if (gridAPI.GetGoalTile().GetTileDepth() == -1)
+        {
+            gridAPI.GetGoalTile().SetTileDepth(-(gridAPI.CurNumTiles() - numTilesVisited));
+        }
+        //Debug.Log(numTilesVisited);
         return true;
     }
 
@@ -244,27 +384,45 @@ public class BoardDataHandler : MonoBehaviour
         int numTilesVisited = 1;
 
         Tile curTile;
+        bool foundGoal = false;
 
-        while(unVisitedKnownTiles.Count > 0)
+        while(unVisitedKnownTiles.Count > 0 && !foundGoal)
         {
             int curTileIndex = GetShortestTileIndex(unVisitedKnownTiles);
             curTile = unVisitedKnownTiles[curTileIndex];
             curTile.visited = 1;
             numTilesVisited++;
-            List<Tile> tilesInRange = GetInRangeTiles(curTile, 1);
-
-            for (int i = 0; i < tilesInRange.Count; i++)
+            //Debug.Log(curTile.y + ", " + curTile.x);
+            if (curTile != gridAPI.GetGoalTile())
             {
-                if(tilesInRange[i].GetSpfValue() == -1 || tilesInRange[i].GetSpfValue() > curTile.GetSpfValue() + 1)
+                List<Tile> tilesInRange = GetInRangeTiles(curTile, 1);
+
+                for (int i = 0; i < tilesInRange.Count; i++)
                 {
-                    if (!unVisitedKnownTiles.Contains(tilesInRange[i]))
+                    if (tilesInRange[i].GetSpfValue() == -1 || tilesInRange[i].GetSpfValue() > curTile.GetSpfValue() + 1)
                     {
-                        unVisitedKnownTiles.Add(tilesInRange[i]);
+                        if (!unVisitedKnownTiles.Contains(tilesInRange[i]))
+                        {
+                            unVisitedKnownTiles.Add(tilesInRange[i]);
+                        }
+                        tilesInRange[i].SetSpfValue(curTile.GetSpfValue() + 1);
+                        tilesInRange[i].pfParent = curTile;
+                        if(tilesInRange[i] == gridAPI.GetGoalTile())
+                        {
+                            foundGoal = true;
+                            break;
+                        }
                     }
-                    tilesInRange[i].SetSpfValue(curTile.GetSpfValue() + 1);
+                }
+                if (!foundGoal)
+                {
+                    unVisitedKnownTiles.RemoveAt(curTileIndex);
                 }
             }
-            unVisitedKnownTiles.RemoveAt(curTileIndex);
+            else
+            {
+                break;
+            }
         }
 
         if (gridAPI.GetGoalTile().GetSpfValue() == -1)
@@ -279,86 +437,157 @@ public class BoardDataHandler : MonoBehaviour
     {
         List<Tile> unVisitedKnownTiles = new List<Tile>();
         unVisitedKnownTiles.Add(gridAPI.GetStartTile());
+        int numTilesVisited = 1;
 
         gridAPI.GetStartTile().SetAStarValue(0, GetAStarManHeuWMoves(gridAPI.GetStartTile()));
 
+        int lastIndex = 0;
+
         Tile curTile;
+        bool goalFound = false;
 
-        while(unVisitedKnownTiles.Count > 0)
+        while(unVisitedKnownTiles.Count > 0 && !goalFound)
         {
-            int curTileIndex = GetBestAStarManTile(unVisitedKnownTiles);
-            curTile = unVisitedKnownTiles[curTileIndex];
-            curTile.visited = 1;
-            List<Tile> tilesInRange = GetInRangeTiles(curTile, 1);
-
-            for (int i = 0; i < tilesInRange.Count; i++)
+            int curIndex = GetBestAStarManTile(unVisitedKnownTiles);
+            if(curIndex >= 0)
             {
-                if(tilesInRange[i].GetAStarFV() == -1 || tilesInRange[i].GetAStarFV() > curTile.GetAStarFV() + 1)
+                curTile = unVisitedKnownTiles[curIndex];
+                if (curTile != gridAPI.GetGoalTile())
                 {
-                    if (!unVisitedKnownTiles.Contains(tilesInRange[i]))
+                    curTile.visited = 1;
+                    numTilesVisited++;
+                    //curTile.pfParent = prevBTile;
+
+                    List<Tile> tilesInRange = GetInRangeTiles(curTile, 2);
+
+                    //Debug.Log(curTile.GetNumMoves() + ", " + tilesInRange.Count + "\t" + curTile.y + ", " + curTile.x);
+
+                    for (int i = 0; i < tilesInRange.Count; i++)
                     {
-                        unVisitedKnownTiles.Add(tilesInRange[i]);
+                        if (tilesInRange[i].visited == 0 && (tilesInRange[i].GetAStarFV() == -1 || tilesInRange[i].GetAStarFV() > curTile.GetAStarFV() + 1))
+                        {
+
+                            if (tilesInRange[i].GetAStarHV() == -1)
+                            {
+                                tilesInRange[i].SetAStarValue(curTile.GetAStarFV() + 1, GetAStarManHeuWMoves(tilesInRange[i]));
+                            }
+                            else
+                            {
+                                //Debug.Log("Changed depth");
+                                tilesInRange[i].SetAStarValue(curTile.GetAStarFV() + 1);
+                            }
+
+                            tilesInRange[i].pfParent = curTile;
+
+                            if (tilesInRange[i] == gridAPI.GetGoalTile())
+                            {
+                                goalFound = true;
+                                break;
+                            }
+
+                            if (tilesInRange[i].inAStarList == 0)
+                            {
+                                unVisitedKnownTiles.Add(tilesInRange[i]);
+                                tilesInRange[i].inAStarList = 1;
+                            }
+                        }
                     }
-                    tilesInRange[i].SetAStarValue(curTile.GetAStarFV() + 1, tilesInRange[i].GetAStarHV());
+
+                    //Debug.Log("X0X0X0X0X0X0X0X0X0X0X0X0X0X0X0X0X0X0X0X0");
+
+                    if (!goalFound)
+                    {
+                        unVisitedKnownTiles.RemoveAt(curIndex);
+                    }
+                }
+                else
+                {
+                    break;
                 }
             }
-            unVisitedKnownTiles.RemoveAt(curTileIndex);
+            else if(curIndex == -2)
+            {
+                break;
+            }
+            lastIndex++;
         }
-
+        //Debug.Log(numTilesVisited);
         return true;
     }
 
     private int GetAStarManHeuWMoves(Tile tileToSet)
     {
-        if(tileToSet == gridAPI.GetGoalTile())
+        int tX = tileToSet.x;
+        int tY = tileToSet.y;
+
+        int hX = gridAPI.GetGoalTile().x - tX;
+        int hY = tY - gridAPI.GetGoalTile().y;
+
+        int delX = hX - tileToSet.GetNumMoves();
+        int delY = hY - tileToSet.GetNumMoves();
+
+        //int aDelX = Mathf.Abs(delX);
+        //int aDelY = Mathf.Abs(delY);
+
+        if(delX < 0 && delY >= 0)
         {
-            return 0;
+            return delY;
+        }
+        else if(delY < 0 && delX >= 0)
+        {
+            return delX;
         }
         else
         {
-            int hX = Mathf.Abs(tileToSet.x - gridAPI.GetGoalTile().x);
-            int hY = Mathf.Abs(tileToSet.y - gridAPI.GetGoalTile().y);
-
-            int delX = Mathf.Abs(hX - tileToSet.GetNumMoves());
-            int delY = Mathf.Abs(hY - tileToSet.GetNumMoves());
-
-            return delX + delY;
+           return (delX < delY) ? delX : delY;
         }
     }
 
     private int GetBestAStarManTile(List<Tile> listToFindFrom)
     {
         int retIndex = -1;
+        bool found = false;
 
         if(listToFindFrom != null)
         {
             int curLowestGValue = -1;
-            int curLowestHValue = -1;
+            int curLowestFValue = -1;
 
             for (int i = 0; i < listToFindFrom.Count; i++)
             {
                 if(listToFindFrom[i].visited == 0 && (curLowestGValue == -1 || listToFindFrom[i].GetAStarGV() < curLowestGValue))
                 {
-                    if(listToFindFrom[0].GetAStarGV() == curLowestGValue)
+                    if(listToFindFrom[i].GetAStarGV() == curLowestGValue)
                     {
-                        if(listToFindFrom[i].GetAStarHV() < curLowestHValue)
+                        if(listToFindFrom[i].GetAStarFV() < curLowestFValue)
                         {
                             curLowestGValue = listToFindFrom[i].GetAStarGV();
-                            curLowestHValue = listToFindFrom[i].GetAStarHV();
+                            curLowestFValue = listToFindFrom[i].GetAStarFV();
                             retIndex = i;
+                            found = true;
                         }
                     }
                     else
                     {
                         curLowestGValue = listToFindFrom[i].GetAStarGV();
-                        curLowestHValue = listToFindFrom[i].GetAStarHV();
+                        curLowestFValue = listToFindFrom[i].GetAStarFV();
                         retIndex = i;
+                        found = true;
                     }
+                    //Debug.Log("FoundA*LOWESET: " + curLowestGValue);
                 }
             }
         }
 
-        return retIndex;
+        if (found)
+        {
+            return retIndex;
+        }
+        else
+        {
+            return -2;
+        }
+
     }
 
     private int GetShortestTileIndex(List<Tile> listToSortFrom)
@@ -374,7 +603,11 @@ public class BoardDataHandler : MonoBehaviour
             {
                 int curTileValue = listToSortFrom[i].GetSpfValue();
 
-                if (listToSortFrom[i].visited == 0 && curTileValue < curLowestValue)
+                if (listToSortFrom[i] == gridAPI.GetGoalTile())
+                {
+                    return i;
+                }
+                else if (listToSortFrom[i].visited == 0 && curTileValue < curLowestValue)
                 {
                     curLowestValue = curTileValue;
                     retIndex = i;
@@ -405,6 +638,10 @@ public class BoardDataHandler : MonoBehaviour
                 {
                     returnTiles.Add(tileToAdd);
                 }
+                else if (mode == 2 && tileToAdd.visited == 0)
+                {
+                    returnTiles.Add(tileToAdd);
+                }
             }
             if (tile.y + numMoves < gridAPI.GridSize())
             {
@@ -415,6 +652,10 @@ public class BoardDataHandler : MonoBehaviour
                     returnTiles.Add(tileToAdd);
                 }
                 else if (mode == 1)
+                {
+                    returnTiles.Add(tileToAdd);
+                }
+                else if (mode == 2 && tileToAdd.visited == 0)
                 {
                     returnTiles.Add(tileToAdd);
                 }
@@ -432,6 +673,10 @@ public class BoardDataHandler : MonoBehaviour
                 {
                     returnTiles.Add(tileToAdd);
                 }
+                else if (mode == 2 && tileToAdd.visited == 0)
+                {
+                    returnTiles.Add(tileToAdd);
+                }
             }
             if (tile.x + numMoves < gridAPI.GridSize())
             {
@@ -442,6 +687,10 @@ public class BoardDataHandler : MonoBehaviour
                     returnTiles.Add(tileToAdd);
                 }
                 else if (mode == 1)
+                {
+                    returnTiles.Add(tileToAdd);
+                }
+                else if (mode == 2 && tileToAdd.visited == 0)
                 {
                     returnTiles.Add(tileToAdd);
                 }

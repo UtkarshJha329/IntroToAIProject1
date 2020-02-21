@@ -15,20 +15,17 @@ public class CameraManager : MonoBehaviour
     {
         #region CAMERA ZOOM
         //ZOOM OUT if Key 'O' is pressed
-        if (Input.GetKeyDown(KeyCode.O))
+        if (Input.GetKey(KeyCode.O))
         {
-            if (Camera.main.orthographicSize <= 12)
-            {
-                Camera.main.orthographicSize++;
-            }
+            Camera.main.orthographicSize++;
         }
 
         //ZOOM IN if Key 'I' is pressed
-        else if (Input.GetKeyDown(KeyCode.I))
+        else if (Input.GetKey(KeyCode.I))
         {
             if (Camera.main.orthographicSize >= 6)
             {
-                Camera.main.orthographicSize--;
+                Camera.main.orthographicSize-= 0.5f;
             }
         }
         #endregion
