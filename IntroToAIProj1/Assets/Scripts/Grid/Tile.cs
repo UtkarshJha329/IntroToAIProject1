@@ -17,6 +17,7 @@ public class Tile : MonoBehaviour
     private int aStarHV = -1;
     private int aStarGV = -1;
     [HideInInspector] public int inAStarList = 0;
+    [HideInInspector] public int listPos = -1;
     private UITextHandler tileMovesUI;
     private UITextHandler tileDepthUI;
     private UITextHandler tileSpfVUI;
@@ -124,7 +125,7 @@ public class Tile : MonoBehaviour
     public void SetAStarValue(int _aStarF)
     {
         aStarFV = _aStarF;
-        aStarGV = aStarFV + aStarHV;
+        aStarGV = 3 * aStarFV + aStarHV;
         tileSpfVUI.SetTextOfTile(aStarFV.ToString());
         //Debug.Log("Set depth: "+ depth);
     }

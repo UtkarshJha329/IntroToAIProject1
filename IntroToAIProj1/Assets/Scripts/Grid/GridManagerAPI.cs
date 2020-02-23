@@ -42,6 +42,7 @@ public class GridManagerAPI : MonoBehaviour
     [HideInInspector] public bool doSPF = false;
     [HideInInspector] public bool doAStar = false;
     [HideInInspector] public int hilClimbNumIter = 100;
+    [HideInInspector] public bool disabling = false;
 
     public Color gridElementColour;
     public Color gridStartElementColour;
@@ -171,6 +172,11 @@ public class GridManagerAPI : MonoBehaviour
         return tileDataList[x * gridSize + y];
     }
 
+    public Tile GetTileByCoordRev(int x, int y)
+    {
+        return tileDataList[y * gridSize + x];
+    }
+
     public Tile GetStartTile()
     {
         return GetTileByCoord(startTileCoord.x, startTileCoord.y);
@@ -199,7 +205,7 @@ public class GridManagerAPI : MonoBehaviour
 
     public bool ResetDepthValues()
     {
-        for (int i = 0; i < tileDataList.Count; i++)
+        for (int i = 0; i < CurNumTiles(); i++)
         {
             tileDataList[i].pfParent = null;
             tileDataList[i].SetTileDepth(-1);
@@ -209,17 +215,19 @@ public class GridManagerAPI : MonoBehaviour
 
     public bool ResetSpfRValues()
     {
-        for (int i = 0; i < tileDataList.Count; i++)
+        for (int i = 0; i < CurNumTiles(); i++)
         {
+            tileDataList[i].pfParent = null;
             tileDataList[i].SetSpfValue(-1);
             tileDataList[i].visited = 0;
+            tileDataList[i].inAStarList = 0;
         }
         return true;
     }
 
     public bool ResetAStarValues()
     {
-        for (int i = 0; i < tileDataList.Count; i++)
+        for (int i = 0; i < CurNumTiles(); i++)
         {
             tileDataList[i].pfParent = null;
             tileDataList[i].SetAStarValue(-1, 0);
@@ -232,6 +240,11 @@ public class GridManagerAPI : MonoBehaviour
     public void SetTimerText(string timerText)
     {
         valueSettingHandler.SetTimerText(timerText);
+    }
+
+    public void SetNumTilesChecked(int numTilesChecked)
+    {
+        valueSettingHandler.SetNumTilesText(numTilesChecked);
     }
 
     public void ResetTileColours()
@@ -286,7 +299,7 @@ public class GridManagerAPI : MonoBehaviour
         for (int i = 0; i < tileDataList.Count; i++)
         {
             tiles[i].SetActive(false);
-            tileDataList[i].SetTileDepth(-1);
+            //tileDataList[i].SetTileDepth(-1);
             //tileMovesUIList[i].SetActive(false);
         }
     }

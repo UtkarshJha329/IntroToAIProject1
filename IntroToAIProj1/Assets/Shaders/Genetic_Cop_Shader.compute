@@ -1,0 +1,100 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel RandomLegalMoves
+#pragma kernel GeneticSwap
+
+uint wang_hash(uint seed)
+{
+	seed = (seed ^ 61) ^ (seed >> 16);
+	seed *= 9;
+	seed = seed ^ (seed >> 4);
+	seed *= 0x27d4eb2d;
+	seed = seed ^ (seed >> 15);
+	return seed;
+}
+
+float Random(uint seed) {
+	return ((float)wang_hash(seed) / pow(10, 9)) / 4.5f;
+}
+
+int RandomRange(uint seed, int min, int max) {
+	int dif = max - min;
+	return ((int)floor(Random(seed) * dif)) + min;
+}
+
+struct Pos {
+	int x;
+	int y;
+	int numMoves;
+	float seedA;
+};
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWStructuredBuffer<Pos> testInts;
+RWStructuredBuffer<Pos> testInts2;
+
+uniform uint gridSize;
+uniform float seedTime;
+
+float randomSeedUsed = 0;
+
+[numthreads(4,4,2)]
+void RandomLegalMoves(uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+	int chooseX = 0;
+
+	float maxX = (id.x <= gridSize / 2) ? gridSize - id.x : gridSize - id.x / 2;
+	float maxY = (id.y <= gridSize / 2) ? gridSize - id.y : gridSize - id.y / 2;
+
+	int pos = id.x * gridSize + id.y;
+	
+	uint firstSeed = wang_hash(((id.x + gridSize) * gridSize + id.y * gridSize * 30) * seedTime * 10 * (id.z + gridSize));
+	uint seed = wang_hash(firstSeed) * 2;
+
+	int randomX = RandomRange(seed, 1, maxX);
+	seed = wang_hash(seed) * 2;
+	int randomY = RandomRange(seed, 1, maxY);
+	seed = wang_hash(seed) * 2;
+
+	float chooseRand = Random(seed);
+	seed = wang_hash(seed) * 2;
+
+	if (chooseRand < 0.5f) {
+		chooseX = 1;
+	}
+
+	if (id.z == 1) {
+		testInts2[pos].x = id.x;
+		testInts2[pos].y = id.y;
+		testInts2[pos].numMoves = 2;
+	
+		testInts[pos].seedA = RandomRange(seed, 1, maxX);
+		
+		if (chooseX == 1) {
+			testInts2[pos].numMoves = (int)randomX;
+		}
+		else {
+			testInts2[pos].numMoves = (int)randomY;
+		}
+	}
+	else if(id.z == 0) {
+		testInts[pos].x = id.x;
+		testInts[pos].y = id.y;
+		testInts[pos].numMoves = 1;
+
+		testInts2[pos].seedA = Random(seed);
+
+		if (chooseX == 1) {
+			testInts[pos].numMoves = (int)randomX;
+		}
+		else {
+			testInts[pos].numMoves = (int)randomY;
+		}
+	}
+}
+
+[numthreads(4, 4, 2)]
+void GeneticSwap(uint3 id: SV_DispatchThreadID) {
+
+}

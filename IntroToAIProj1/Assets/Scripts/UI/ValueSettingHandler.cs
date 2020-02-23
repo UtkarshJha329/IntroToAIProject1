@@ -11,6 +11,7 @@ public class ValueSettingHandler : MonoBehaviour
     [SerializeField] private TextMeshProUGUI HillClimbValueText;
     [SerializeField] private Slider HillClimbSlider;
     [SerializeField] private TextMeshProUGUI TimerText;
+    [SerializeField] private TextMeshProUGUI NumTilesCheckedText;
 
     private int nValue = 5;
     [HideInInspector] public bool generateGrid = false;
@@ -59,22 +60,26 @@ public class ValueSettingHandler : MonoBehaviour
                 nValue = 11;
                 break;
             case 5:
+                NValueText.SetText("N value: 16");
+                nValue = 16;
+                break;
+            case 6:
                 NValueText.SetText("N value: 55");
                 nValue = 55;
                 break;
-            case 6:
+            case 7:
                 NValueText.SetText("N value: 66");
                 nValue = 66;
                 break;
-            case 7:
+            case 8:
                 NValueText.SetText("N value: 77");
                 nValue = 77;
                 break;
-            case 8:
+            case 9:
                 NValueText.SetText("N value: 88");
                 nValue = 88;
                 break;
-            case 9:
+            case 10:
                 NValueText.SetText("N value: 99");
                 nValue = 99;
                 break;
@@ -132,5 +137,10 @@ public class ValueSettingHandler : MonoBehaviour
     public void SetTimerText(string _timerText)
     {
         TimerText.SetText(_timerText);
+    }
+
+    public void SetNumTilesText(int numTilesChecked)
+    {
+        NumTilesCheckedText.SetText(numTilesChecked.ToString());
     }
 }

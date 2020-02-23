@@ -7,8 +7,6 @@ public class BoardDataHandler : MonoBehaviour
     public GameObject gridSceneObject;
     private GridManagerAPI gridAPI;
 
-    public Color pathColor;
-
     private TimeKeeper stopwatch;
     private bool newPf = false;
     private int TValueToChoose = 0;
@@ -16,6 +14,8 @@ public class BoardDataHandler : MonoBehaviour
     private Tile curPTile;
     private float lerpValue = 1.0f;
 
+    private int numTilesChecked = 0;
+    private int totalPathNumMoves = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -48,6 +48,7 @@ public class BoardDataHandler : MonoBehaviour
                     {
                         //Debug.Log("Created Board With Initial Values");
                         gridAPI.SetTimerText(stopwatch.Stop());
+                        gridAPI.SetNumTilesChecked(numTilesChecked);
                         newPf = true;
                         TValueToChoose = 0;
                         curPTile = gridAPI.GetGoalTile();
@@ -84,6 +85,7 @@ public class BoardDataHandler : MonoBehaviour
             {
                 gridAPI.doBFS = false;
                 gridAPI.SetTimerText(stopwatch.Stop());
+                gridAPI.SetNumTilesChecked(numTilesChecked);
                 newPf = true;
                 gridAPI.ResetTileColours();
                 TValueToChoose = 0;
@@ -100,8 +102,8 @@ public class BoardDataHandler : MonoBehaviour
         //PART 4 Of The Project
         if (gridAPI.boardGenerated && gridAPI.doHillClimb)
         {
-            gridAPI.ResetDepthValues();
             stopwatch.Start();
+            totalPathNumMoves = 0;
             if (HillClimb(gridAPI.hilClimbNumIter))
             {
                 gridAPI.doHillClimb = false;
@@ -129,6 +131,7 @@ public class BoardDataHandler : MonoBehaviour
             {
                 gridAPI.doSPF = false;
                 gridAPI.SetTimerText(stopwatch.Stop());
+                gridAPI.SetNumTilesChecked(numTilesChecked);
                 newPf = true;
                 gridAPI.ResetTileColours();
                 TValueToChoose = 1;
@@ -151,6 +154,7 @@ public class BoardDataHandler : MonoBehaviour
             {
                 gridAPI.doAStar = false;
                 gridAPI.SetTimerText(stopwatch.Stop());
+                gridAPI.SetNumTilesChecked(numTilesChecked);
                 newPf = true;
                 gridAPI.ResetTileColours();
                 TValueToChoose = 2;
@@ -169,6 +173,8 @@ public class BoardDataHandler : MonoBehaviour
         {
             if(curPTile.pfParent != null && curPTile.pfParent != gridAPI.GetStartTile())
             {
+                totalPathNumMoves += curPTile.pfParent.GetNumMoves();
+                //Debug.Log(curPTile.pfParent.GetNumMoves());
                 if(TValueToChoose == 0)
                 {
                     lerpValue -= 1.0f / gridAPI.GetGoalTile().GetTileDepth();
@@ -193,6 +199,12 @@ public class BoardDataHandler : MonoBehaviour
                         lerpValue));
                 }
                 curPTile = curPTile.pfParent;
+            }
+            else
+            {
+                totalPathNumMoves += gridAPI.GetStartTile().GetNumMoves();
+                //Debug.Log(totalPathNumMoves);
+                totalPathNumMoves = 0;
             }
         }
     }
@@ -236,6 +248,92 @@ public class BoardDataHandler : MonoBehaviour
         return true;
     }
 
+    private bool RandHillClimbTileMove(int x, int y, int randomSide)
+    {
+        //Random.InitState(oldSeed + 100);
+        //oldSeed += 100;
+        //Debug.Log("element: " + (i * gridSize + j));
+
+        int maxX = 0;
+        int minX = 0;
+        int maxY = 0;
+        int minY = 0;
+
+        int dividePoint = 3;
+
+        int gridSize = gridAPI.GridSize();
+
+        if((x != 0 && y != 0) && (x != gridAPI.GetGoalTile().x - 1 && y != gridAPI.GetGoalTile().y - 1))
+        {
+            if (randomSide == 0)
+            {
+                if (x <= gridSize / dividePoint)
+                {
+                    maxX = gridSize / dividePoint;
+                    minX = 1;
+                }
+                else
+                {
+                    maxX = (x <= gridSize / 2) ? gridSize - x : gridSize - x / 2;
+                    minX = 1;
+                }
+
+                maxY = (y <= gridSize / 2) ? gridSize - y : gridSize - y / 2;
+                minY = 1;
+            }
+            else
+            {
+                if (y <= gridSize / dividePoint)
+                {
+                    maxY = gridSize / dividePoint;
+                    minY = 1;
+                }
+                else
+                {
+                    maxY = (y <= gridSize / 2) ? gridSize - y : gridSize - y / 2;
+                    minY = /*gridSize / dividePoint*/1;
+                }
+                maxX = (x <= gridSize / 2) ? gridSize - x : gridSize - x / 2;
+                minX = 1;
+            }
+        }
+        else
+        {
+            if(x == 0 && y == 0)
+            {
+                minX = 1;
+                maxX = gridSize - 1;
+
+                minY = 1;
+                maxY = gridSize - 1;
+            }
+            else
+            {
+                minX = 2;
+                maxX = gridSize;
+
+                minY = 2;
+                maxY = gridSize;
+            }
+        }
+        
+        //Random function's second parameter is exclusive
+        int randomX = Random.Range(minX, maxX);
+        int randomY = Random.Range(minY, maxY);
+
+        int random = Random.Range(0, 2);
+        if (random == 0)
+        {
+            gridAPI.SetNumMovesForTile(x, y, randomX);
+        }
+        else
+        {
+            gridAPI.SetNumMovesForTile(x, y, randomY);
+        }
+
+        return true;
+    }
+
     private bool CalculateDepthForEachTile()
     {
         gridAPI.ResetDepthValues();
@@ -243,7 +341,7 @@ public class BoardDataHandler : MonoBehaviour
 
         gridAPI.GetStartTile().SetTileDepth(0);
         nextLookAtTile.Enqueue(gridAPI.GetStartTile());
-        int numTilesVisited = 1;
+        numTilesChecked = 1;
         
         Tile dequeTile;
 
@@ -260,7 +358,7 @@ public class BoardDataHandler : MonoBehaviour
                     if (inRangeTiles[i].GetTileDepth() == -1)
                     {
                         inRangeTiles[i].SetTileDepth(dequeTile.GetTileDepth() + 1);
-                        numTilesVisited++;
+                        numTilesChecked++;
                         inRangeTiles[i].pfParent = dequeTile;
                         nextLookAtTile.Enqueue(inRangeTiles[i]);
                         if(inRangeTiles[i] == gridAPI.GetGoalTile())
@@ -279,7 +377,7 @@ public class BoardDataHandler : MonoBehaviour
 
         if(gridAPI.GetGoalTile().GetTileDepth() == -1)
         {
-            gridAPI.GetGoalTile().SetTileDepth(-(gridAPI.CurNumTiles() - numTilesVisited));
+            gridAPI.GetGoalTile().SetTileDepth(-(gridAPI.CurNumTiles() - numTilesChecked));
         }
 
         return true;
@@ -291,7 +389,7 @@ public class BoardDataHandler : MonoBehaviour
 
         gridAPI.GetStartTile().SetTileDepth(0);
         nextLookAtTile.Enqueue(gridAPI.GetStartTile());
-        int numTilesVisited = 1;
+        numTilesChecked = 1;
 
         Tile dequeTile;
 
@@ -308,7 +406,7 @@ public class BoardDataHandler : MonoBehaviour
                     if (inRangeTiles[i].GetTileDepth() == -1)
                     {
                         inRangeTiles[i].SetTileDepth(dequeTile.GetTileDepth() + 1);
-                        numTilesVisited++;
+                        numTilesChecked++;
                         inRangeTiles[i].pfParent = dequeTile;
                         nextLookAtTile.Enqueue(inRangeTiles[i]);
                         if (inRangeTiles[i] == gridAPI.GetGoalTile())
@@ -327,7 +425,7 @@ public class BoardDataHandler : MonoBehaviour
 
         if (gridAPI.GetGoalTile().GetTileDepth() == -1)
         {
-            gridAPI.GetGoalTile().SetTileDepth(-(gridAPI.CurNumTiles() - numTilesVisited));
+            gridAPI.GetGoalTile().SetTileDepth(-(gridAPI.CurNumTiles() - numTilesChecked));
         }
         //Debug.Log(numTilesVisited);
         return true;
@@ -335,43 +433,35 @@ public class BoardDataHandler : MonoBehaviour
 
     private bool HillClimb(int numItterations)
     {
-        //Debug.Log("Doing Hill Climb");
         int oldMoves;
         int oldGoalDepth;
 
+        int smallSide = Random.Range(0, 2);
+        //Debug.Log(smallSide);
         for (int i = 0; i < numItterations; i++)
         {
             int randX = Random.Range(0, gridAPI.GridSize());
             int randY = (randX == 0) ? Random.Range(0, gridAPI.GridSize() - 1) : Random.Range(0, gridAPI.GridSize());
-            //Debug.Log(randX + ", " + randY);
 
             oldMoves = gridAPI.GetTileByCoord(randX, randY).GetNumMoves();
             oldGoalDepth = gridAPI.GetGoalTile().GetTileDepth();
-            //Debug.Log("BEFORE: (" + randX + ", " + randY + ")" + "NumMoves: " + gridAPI.GetTileByCoord(randX, randY).GetNumMoves());
-            // yield return new WaitForSeconds(0.5f);
 
-            if (SetTilRandomLegalMove(randX, randY))
+            if (RandHillClimbTileMove(randX, randY, smallSide))
             {
-                //gridAPI.ResetDepthValues();
-                //Debug.Log("AFTER: (" + randX + ", " + randY + ")" + "NumMoves: " + gridAPI.GetTileByCoord(randX, randY).GetNumMoves());
                 if (CalculateDepthForEachTile())
                 {
                     if (gridAPI.GetGoalTile().GetTileDepth() < oldGoalDepth)
                     {
                         gridAPI.GetTileByCoord(randX, randY).SetNumMoves(oldMoves);
+                        numTilesChecked = 0;
                         CalculateDepthForEachTile();
-                    }
-                    else
-                    {
-                        //Debug.Log(gridAPI.GetGoalTile().GetTileDepth() + ", " + oldGoalDepth);
+                        gridAPI.GetGoalTile().SetTileDepth(oldGoalDepth);
                     }
                 }
             }
 
-            //yield return new WaitForSeconds(0.5f);
         }
 
-        //yield return null;
         return true;
     }
 
@@ -381,7 +471,7 @@ public class BoardDataHandler : MonoBehaviour
         unVisitedKnownTiles.Add(gridAPI.GetStartTile());
 
         gridAPI.GetStartTile().SetSpfValue(0);
-        int numTilesVisited = 1;
+        numTilesChecked = 1;
 
         Tile curTile;
         bool foundGoal = false;
@@ -391,7 +481,6 @@ public class BoardDataHandler : MonoBehaviour
             int curTileIndex = GetShortestTileIndex(unVisitedKnownTiles);
             curTile = unVisitedKnownTiles[curTileIndex];
             curTile.visited = 1;
-            numTilesVisited++;
             //Debug.Log(curTile.y + ", " + curTile.x);
             if (curTile != gridAPI.GetGoalTile())
             {
@@ -401,9 +490,11 @@ public class BoardDataHandler : MonoBehaviour
                 {
                     if (tilesInRange[i].GetSpfValue() == -1 || tilesInRange[i].GetSpfValue() > curTile.GetSpfValue() + 1)
                     {
-                        if (!unVisitedKnownTiles.Contains(tilesInRange[i]))
+                        numTilesChecked++;
+                        if (tilesInRange[i].inAStarList == 0)
                         {
                             unVisitedKnownTiles.Add(tilesInRange[i]);
+                            tilesInRange[i].inAStarList = 1;
                         }
                         tilesInRange[i].SetSpfValue(curTile.GetSpfValue() + 1);
                         tilesInRange[i].pfParent = curTile;
@@ -427,7 +518,7 @@ public class BoardDataHandler : MonoBehaviour
 
         if (gridAPI.GetGoalTile().GetSpfValue() == -1)
         {
-            gridAPI.GetGoalTile().SetTileDepth(-(gridAPI.CurNumTiles() - numTilesVisited));
+            gridAPI.GetGoalTile().SetTileDepth(-(gridAPI.CurNumTiles() - numTilesChecked));
         }
 
         return true;
@@ -437,7 +528,7 @@ public class BoardDataHandler : MonoBehaviour
     {
         List<Tile> unVisitedKnownTiles = new List<Tile>();
         unVisitedKnownTiles.Add(gridAPI.GetStartTile());
-        int numTilesVisited = 1;
+        numTilesChecked = 1;
 
         gridAPI.GetStartTile().SetAStarValue(0, GetAStarManHeuWMoves(gridAPI.GetStartTile()));
 
@@ -455,7 +546,6 @@ public class BoardDataHandler : MonoBehaviour
                 if (curTile != gridAPI.GetGoalTile())
                 {
                     curTile.visited = 1;
-                    numTilesVisited++;
                     //curTile.pfParent = prevBTile;
 
                     List<Tile> tilesInRange = GetInRangeTiles(curTile, 2);
@@ -466,7 +556,7 @@ public class BoardDataHandler : MonoBehaviour
                     {
                         if (tilesInRange[i].visited == 0 && (tilesInRange[i].GetAStarFV() == -1 || tilesInRange[i].GetAStarFV() > curTile.GetAStarFV() + 1))
                         {
-
+                            numTilesChecked++;
                             if (tilesInRange[i].GetAStarHV() == -1)
                             {
                                 tilesInRange[i].SetAStarValue(curTile.GetAStarFV() + 1, GetAStarManHeuWMoves(tilesInRange[i]));
@@ -511,6 +601,11 @@ public class BoardDataHandler : MonoBehaviour
             }
             lastIndex++;
         }
+
+        if (gridAPI.GetGoalTile().GetAStarFV() == -1)
+        {
+            gridAPI.GetGoalTile().SetAStarValue(-(gridAPI.CurNumTiles() - numTilesChecked));
+        }
         //Debug.Log(numTilesVisited);
         return true;
     }
@@ -548,18 +643,18 @@ public class BoardDataHandler : MonoBehaviour
         int retIndex = -1;
         bool found = false;
 
-        if(listToFindFrom != null)
+        if (listToFindFrom != null)
         {
             int curLowestGValue = -1;
             int curLowestFValue = -1;
 
             for (int i = 0; i < listToFindFrom.Count; i++)
             {
-                if(listToFindFrom[i].visited == 0 && (curLowestGValue == -1 || listToFindFrom[i].GetAStarGV() < curLowestGValue))
+                if (listToFindFrom[i].visited == 0 && (curLowestGValue == -1 || listToFindFrom[i].GetAStarGV() < curLowestGValue))
                 {
-                    if(listToFindFrom[i].GetAStarGV() == curLowestGValue)
+                    if (listToFindFrom[i].GetAStarGV() == curLowestGValue)
                     {
-                        if(listToFindFrom[i].GetAStarFV() < curLowestFValue)
+                        if (listToFindFrom[i].GetAStarFV() < curLowestFValue)
                         {
                             curLowestGValue = listToFindFrom[i].GetAStarGV();
                             curLowestFValue = listToFindFrom[i].GetAStarFV();
@@ -574,19 +669,23 @@ public class BoardDataHandler : MonoBehaviour
                         retIndex = i;
                         found = true;
                     }
-                    //Debug.Log("FoundA*LOWESET: " + curLowestGValue);
                 }
             }
-        }
-
-        if (found)
-        {
-            return retIndex;
+            if (found)
+            {
+                //Debug.Log("FoundA*LOWESET: " + curLowestGValue);
+                return retIndex;
+            }
+            else
+            {
+                return -2;
+            }
         }
         else
         {
-            return -2;
+            return -1;
         }
+
 
     }
 

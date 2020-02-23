@@ -1,6 +1,42 @@
 Base path: 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data', plugins path 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
-Cmd: compileSnippet
-  api=4 type=0 insize=11846 outsize=1258 kw=SHADOWS_SPLIT_SPHERES pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_COLORSPACE_GAMMA UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_FULL_HDR ok=1
-Cmd: compileSnippet
-  api=4 type=0 insize=2295 outsize=858 kw=UNITY_UI_ALPHACLIP pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_COLORSPACE_GAMMA UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_FULL_HDR ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2470 outsize=228 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2466 outsize=2804 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2719 outsize=3816 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(20): 'wang_hash': no matching 1 parameter function
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(20): syntax error: unexpected token '*'
+  api=4 insize=2855 outsize=0 ok=0
+Cmd: compileComputeKernel
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(75): syntax error: unexpected token ';'
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(77): syntax error: unexpected token '{'
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(84): syntax error: unexpected token 'else'
+  api=4 insize=2853 outsize=0 ok=0
+Cmd: compileComputeKernel
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(21): syntax error: unexpected token ')'
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(53): undeclared identifier 'x'
+  api=4 insize=2232 outsize=0 ok=0
+Cmd: compileComputeKernel
+  api=4 insize=2242 outsize=228 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2257 outsize=228 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2292 outsize=228 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2276 outsize=228 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(16): syntax error: unexpected token ';'
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(19): syntax error: unexpected token '{'
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(21): undeclared identifier 'dif'
+  api=4 insize=2253 outsize=0 ok=0
+Cmd: compileComputeKernel
+  api=4 insize=2266 outsize=228 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2272 outsize=228 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2274 outsize=228 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2282 outsize=228 ok=1

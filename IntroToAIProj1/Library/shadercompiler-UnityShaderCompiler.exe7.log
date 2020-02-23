@@ -1,0 +1,13 @@
+Base path: 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data', plugins path 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data/PlaybackEngines'
+Cmd: initializeCompiler
+Cmd: compileComputeKernel
+  api=4 insize=2904 outsize=228 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2221 outsize=228 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2273 outsize=228 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(16): syntax error: unexpected token ';'
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(19): syntax error: unexpected token '{'
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(21): undeclared identifier 'dif'
+  api=4 insize=2280 outsize=0 ok=0

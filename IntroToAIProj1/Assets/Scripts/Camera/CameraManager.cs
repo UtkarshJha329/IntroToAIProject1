@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
+
+    float orthoSize = 0;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        orthoSize = Camera.main.orthographicSize;
     }
 
     // Update is called once per frame
@@ -27,6 +30,15 @@ public class CameraManager : MonoBehaviour
             {
                 Camera.main.orthographicSize-= 0.5f;
             }
+        }
+
+        else if(Input.mouseScrollDelta.y != 0)
+        {
+            if(orthoSize - Input.mouseScrollDelta.y * 0.5f >= 4)
+            {
+                orthoSize -=  Input.mouseScrollDelta.y * 0.5f;
+            }
+            Camera.main.orthographicSize = orthoSize;
         }
         #endregion
     }

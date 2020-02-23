@@ -1,4 +1,15 @@
 Base path: 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data', plugins path 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
-Cmd: compileSnippet
-  api=4 type=1 insize=1302 outsize=218 kw=UNITY_PASS_SHADOWCASTER SHADOWS_DEPTH pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_COLORSPACE_GAMMA UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_FULL_HDR ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2465 outsize=228 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2723 outsize=228 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(70): syntax error: unexpected token ')'
+  api=4 insize=2732 outsize=0 ok=0
+Cmd: compileComputeKernel
+  api=4 insize=2839 outsize=5644 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2232 outsize=3182 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2273 outsize=228 ok=1
