@@ -24,6 +24,8 @@ public class Tile : MonoBehaviour
 
     private SpriteRenderer tileSprite;
 
+    public int oldNumMovesG = -1;
+
     public Tile()
     {
         x = 0;
@@ -139,6 +141,10 @@ public class Tile : MonoBehaviour
         //Debug.Log("Set depth: "+ depth);
     }
 
+    public void SetToOldNumMoves()
+    {
+        numMoves = oldNumMovesG;
+    }
     public int GetAStarFV()
     {
         return aStarFV;

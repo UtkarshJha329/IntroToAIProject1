@@ -41,6 +41,7 @@ public class GridManagerAPI : MonoBehaviour
     [HideInInspector] public bool doHillClimb = false;
     [HideInInspector] public bool doSPF = false;
     [HideInInspector] public bool doAStar = false;
+    [HideInInspector] public bool doGeneticMating = false;
     [HideInInspector] public int hilClimbNumIter = 100;
     [HideInInspector] public bool disabling = false;
 
@@ -89,6 +90,12 @@ public class GridManagerAPI : MonoBehaviour
         {
             doAStar = true;
             valueSettingHandler.doAStar = false;
+        }
+
+        if (valueSettingHandler.doGeneticMating)
+        {
+            doGeneticMating = true;
+            valueSettingHandler.doGeneticMating = false;
         }
 
     }
@@ -201,6 +208,11 @@ public class GridManagerAPI : MonoBehaviour
     public int CurNumTiles()
     {
         return gridSize * gridSize;
+    }
+
+    public Tile ListEleByIndex(int index)
+    {
+        return tileDataList[index];
     }
 
     public bool ResetDepthValues()

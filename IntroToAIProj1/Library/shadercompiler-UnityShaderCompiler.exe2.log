@@ -1,15 +1,49 @@
 Base path: 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data', plugins path 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
 Cmd: compileComputeKernel
-  api=4 insize=2465 outsize=228 ok=1
+  api=4 insize=9490 outsize=858 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=2723 outsize=228 ok=1
+  api=4 insize=9478 outsize=853 ok=1
 Cmd: compileComputeKernel
-  error: 2 plat 4 at Genetic_Cop_Shader.compute(70): syntax error: unexpected token ')'
-  api=4 insize=2732 outsize=0 ok=0
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(162): undeclared identifier 'randomSide'
+  api=4 insize=7472 outsize=0 ok=0
 Cmd: compileComputeKernel
-  api=4 insize=2839 outsize=5644 ok=1
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(166): undeclared identifier 'Min'
+  api=4 insize=7472 outsize=0 ok=0
 Cmd: compileComputeKernel
-  api=4 insize=2232 outsize=3182 ok=1
+  api=4 insize=7448 outsize=4864 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=2273 outsize=228 ok=1
+  api=4 insize=7646 outsize=853 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=7856 outsize=228 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=8002 outsize=2359 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=7594 outsize=228 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(157): syntax error: unexpected token '{'
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(178): undeclared identifier 'maxX'
+  api=4 insize=7605 outsize=0 ok=0
+Cmd: compileComputeKernel
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=7606 outsize=858 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=7964 outsize=228 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=7963 outsize=853 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=7931 outsize=858 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=8030 outsize=2359 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=4810 outsize=858 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=4780 outsize=2359 ok=1
+Unhandled exception: Protocol error - unexpected end of data (did the Editor crash?)
+
+Quitting shader compiler process

@@ -168,7 +168,18 @@ public class BoardDataHandler : MonoBehaviour
             }
         }
 
-        
+        //PART 7 Of The Project
+        if (gridAPI.boardGenerated && gridAPI.doGeneticMating && gridAPI.GridSize() <= 16)
+        {
+            gridAPI.doGeneticMating = false;
+            stopwatch.Start();
+            Genetics();
+            gridAPI.SetTimerText(stopwatch.Stop().ToString());
+            gridAPI.ResetDepthValues();
+            BFS();
+        }
+
+        //Path tile animation
         if (newPf && Input.GetMouseButton(0))
         {
             if(curPTile.pfParent != null && curPTile.pfParent != gridAPI.GetStartTile())
@@ -248,28 +259,44 @@ public class BoardDataHandler : MonoBehaviour
         return true;
     }
 
-    private bool RandHillClimbTileMove(int x, int y, int randomSide)
+    private int RandReductionTileMove(int x, int y, int randomSide)
     {
         //Random.InitState(oldSeed + 100);
         //oldSeed += 100;
         //Debug.Log("element: " + (i * gridSize + j));
 
-        int maxX = 0;
-        int minX = 0;
-        int maxY = 0;
-        int minY = 0;
+        int gridSize = gridAPI.GridSize();
+        
+        int maxX = (x <= gridSize / 2) ? gridSize - x : gridSize - x / 2;
+        int minX = 1;
+        int maxY = (y <= gridSize / 2) ? gridSize - y : gridSize - y / 2;
+        int minY = 1;
 
         int dividePoint = 3;
 
-        int gridSize = gridAPI.GridSize();
 
-        if((x != 0 && y != 0) && (x != gridAPI.GetGoalTile().x - 1 && y != gridAPI.GetGoalTile().y - 1))
+        if((x != 0 && y != 0) && (x != gridSize - 1 && y != 1))
         {
             if (randomSide == 0)
             {
-                if (x <= gridSize / dividePoint)
+                if (y >= gridSize / dividePoint)
                 {
-                    maxX = gridSize / dividePoint;
+                    maxY = Mathf.Min(5, gridSize / dividePoint);
+                    minY = 1;
+                }
+                else
+                {
+                    maxY = (y <= gridSize / 2) ? gridSize - y : gridSize - y / 2;
+                    minY = 1;
+                }
+                maxX = (x <= gridSize / 2) ? gridSize - x : gridSize - x / 2;
+                minX = 1;
+            }
+            else
+            {
+                if (x <= (dividePoint - 1) * gridSize / dividePoint)
+                {
+                    maxX = Mathf.Min(5, gridSize / dividePoint);
                     minX = 1;
                 }
                 else
@@ -280,21 +307,6 @@ public class BoardDataHandler : MonoBehaviour
 
                 maxY = (y <= gridSize / 2) ? gridSize - y : gridSize - y / 2;
                 minY = 1;
-            }
-            else
-            {
-                if (y <= gridSize / dividePoint)
-                {
-                    maxY = gridSize / dividePoint;
-                    minY = 1;
-                }
-                else
-                {
-                    maxY = (y <= gridSize / 2) ? gridSize - y : gridSize - y / 2;
-                    minY = /*gridSize / dividePoint*/1;
-                }
-                maxX = (x <= gridSize / 2) ? gridSize - x : gridSize - x / 2;
-                minX = 1;
             }
         }
         else
@@ -324,14 +336,12 @@ public class BoardDataHandler : MonoBehaviour
         int random = Random.Range(0, 2);
         if (random == 0)
         {
-            gridAPI.SetNumMovesForTile(x, y, randomX);
+            return randomX;
         }
         else
         {
-            gridAPI.SetNumMovesForTile(x, y, randomY);
+            return randomY;
         }
-
-        return true;
     }
 
     private bool CalculateDepthForEachTile()
@@ -437,6 +447,7 @@ public class BoardDataHandler : MonoBehaviour
         int oldGoalDepth;
 
         int smallSide = Random.Range(0, 2);
+        int avg = gridAPI.GridSize() / 2;
         //Debug.Log(smallSide);
         for (int i = 0; i < numItterations; i++)
         {
@@ -446,20 +457,17 @@ public class BoardDataHandler : MonoBehaviour
             oldMoves = gridAPI.GetTileByCoord(randX, randY).GetNumMoves();
             oldGoalDepth = gridAPI.GetGoalTile().GetTileDepth();
 
-            if (RandHillClimbTileMove(randX, randY, smallSide))
+            gridAPI.GetTileByCoord(randX, randY).SetNumMoves(RandReductionTileMove(randX, randY, 0));
+            if (CalculateDepthForEachTile())
             {
-                if (CalculateDepthForEachTile())
+                if (gridAPI.GetGoalTile().GetTileDepth() < oldGoalDepth || EvaluateBySumAverage(smallSide, 3) >= avg + 1)
                 {
-                    if (gridAPI.GetGoalTile().GetTileDepth() < oldGoalDepth)
-                    {
-                        gridAPI.GetTileByCoord(randX, randY).SetNumMoves(oldMoves);
-                        numTilesChecked = 0;
-                        CalculateDepthForEachTile();
-                        gridAPI.GetGoalTile().SetTileDepth(oldGoalDepth);
-                    }
+                    gridAPI.GetTileByCoord(randX, randY).SetNumMoves(oldMoves);
+                    numTilesChecked = 0;
+                    CalculateDepthForEachTile();
+                    gridAPI.GetGoalTile().SetTileDepth(oldGoalDepth);
                 }
             }
-
         }
 
         return true;
@@ -608,6 +616,240 @@ public class BoardDataHandler : MonoBehaviour
         }
         //Debug.Log(numTilesVisited);
         return true;
+    }
+
+    private void Genetics()
+    {
+        int gridSize = gridAPI.GridSize();
+
+        int numCopies = 3;
+        GenTile[,] genTiles = GeneticCopy(numCopies);
+
+        float avg = gridAPI.GridSize() / 2;
+        int divide = 3;
+        int divideSide = 0;
+
+        int[] oldGoalDepths = new int[numCopies];
+        int[] oldMoves = new int[numCopies];
+
+        int[] fitness = new int[numCopies];
+
+        int numIterationsH = 100;
+        int numIterationsM = 10;
+
+        int randX;
+        int randY;
+
+        int gensFittest = -1;
+
+        for (int mateIter = 0; mateIter < numIterationsM; mateIter++)
+        {
+            for (int iter = 0; iter < numIterationsH; iter++)
+            {
+                randX = Random.Range(0, gridAPI.GridSize());
+                randY = (randX == 0) ? Random.Range(0, gridAPI.GridSize() - 1) : Random.Range(0, gridAPI.GridSize());
+
+                int pos = randX * gridSize + randY;
+                for (int i = 0; i < numCopies; i++)
+                {
+                    oldMoves[i] = genTiles[pos, i].numMoves;
+                    //Debug.Log(i + ": " + oldMoves[i]);
+                    //Store depth before changing
+                    oldGoalDepths[i] = genTiles[gridSize - 1, i].tileDepth;//GOAL TILE DEPTH
+
+                    //Change and calculate depth
+                    genTiles[pos, i].numMoves = RandReductionTileMove(randX, randY, divideSide);
+                    GenResetDepth(ref genTiles, i);
+                    GenBFS(ref genTiles, i);
+
+                    float sumEval = GenEvaluateBySumAverage(ref genTiles, i, divideSide, divide);
+
+                    if (genTiles[gridSize - 1, i].tileDepth < oldGoalDepths[i] || sumEval >= avg + 1)
+                    {
+                        genTiles[pos, i].numMoves = oldMoves[i];
+                        GenResetDepth(ref genTiles, i);
+                        GenBFS(ref genTiles, i);
+                        //Debug.Log("Failed");
+                    }
+                    else
+                    {
+                        //Debug.Log("Worked " + i + ": " + genTiles[gridSize - 1, i].tileDepth + ", " + oldGoalDepths[i]);
+                        fitness[i] = genTiles[gridSize - 1, i].tileDepth + gridSize - (int)sumEval;
+                    }
+                }
+            }
+
+            gensFittest = MaxFitnessIndex(fitness);
+
+            if(gensFittest == 0)
+            {
+                if (fitness[1] > fitness[2])
+                {
+                    MateGenTiles(ref genTiles, 0, 1, divideSide, divide, 1);
+                    MateGenTiles(ref genTiles, 0, 2, divideSide, divide, 0);
+                }
+                else
+                {
+                    MateGenTiles(ref genTiles, 0, 2, divideSide, divide, 1);
+                    MateGenTiles(ref genTiles, 0, 1, divideSide, divide, 0);
+                }
+            }
+            else if(gensFittest == 1)
+            {
+                if (fitness[2] > fitness[0])
+                {
+                    MateGenTiles(ref genTiles, 1, 2, divideSide, divide, 1);
+                    MateGenTiles(ref genTiles, 1, 0, divideSide, divide, 0);
+                }
+                else
+                {
+                    MateGenTiles(ref genTiles, 1, 0, divideSide, divide, 1);
+                    MateGenTiles(ref genTiles, 1, 2, divideSide, divide, 0);
+                }
+
+            }
+            else
+            {
+                if (fitness[0] > fitness[1])
+                {
+                    MateGenTiles(ref genTiles, 2, 0, divideSide, divide, 1);
+                    MateGenTiles(ref genTiles, 2, 1, divideSide, divide, 0);
+                }
+                else
+                {
+                    MateGenTiles(ref genTiles, 2, 1, divideSide, divide, 1);
+                    MateGenTiles(ref genTiles, 2, 0, divideSide, divide, 0);
+                }
+            }
+
+            for (int reCals = 0; reCals < numCopies; reCals++)
+            {
+                GenResetDepth(ref genTiles, reCals);
+                GenBFS(ref genTiles, reCals);
+            }
+        }
+
+
+        int mostFit = MaxFitnessIndex(fitness);
+
+        int cPos = -1;
+        for (int i = 0; i < gridSize; i++)
+        {
+            for (int j = 0; j < gridSize; j++)
+            {
+                cPos = i * gridSize + j;
+                gridAPI.GetTileByCoord(i, j).SetNumMoves(genTiles[cPos, mostFit].numMoves);
+                gridAPI.GetTileByCoord(i, j).SetTileDepth(genTiles[cPos, mostFit].tileDepth);
+            }
+        }
+
+        //for (int i = 0; i < numCopies; i++)
+        //{
+        //    Debug.Log(fitness[i]);
+        //    Debug.Log("GOAL: " + oldGoalDepths[i]);
+        //}
+
+        //Debug.Log(MaxFitnessIndex(fitness));
+
+    }
+
+    private int MaxFitnessIndex(int[] fitness)
+    {
+        int a = Mathf.Max(fitness[0], fitness[1], fitness[2]);
+
+        if(a == fitness[0])
+        {
+            return 0;
+        }else if(a == fitness[1])
+        {
+            return 1;
+        }
+        else
+        {
+            return 2;
+        }
+    }
+
+    private GenTile[,] GeneticCopy(int numCopies)
+    {
+        CalculateDepthForEachTile();
+        int totalNumEle = (int)Mathf.Pow(gridAPI.GridSize(), 2);
+        GenTile[,] strands = new GenTile[totalNumEle,numCopies];
+
+        Tile tempTile;
+        for (int i = 0; i < totalNumEle; i++)
+        {
+            tempTile = gridAPI.ListEleByIndex(i);
+
+            for (int j = 0; j < numCopies; j++)
+            {
+                strands[i, j] = new GenTile();
+                strands[i, j].numMoves = tempTile.GetNumMoves();
+                strands[i, j].tileDepth = tempTile.GetTileDepth();
+                strands[i, j].x = tempTile.x;
+                strands[i, j].y = tempTile.y;
+                strands[i, j].index = i;
+            }
+        }
+
+        return strands;
+    }
+
+    private void GenBFS(ref GenTile[,] genTiles, int cloneNum)
+    {
+        Queue<GenTile> nextLookAtTile = new Queue<GenTile>();
+
+        int gridSize = gridAPI.GridSize();
+
+        genTiles[gridSize * (gridSize - 1), cloneNum].tileDepth = 0;
+        nextLookAtTile.Enqueue(genTiles[gridSize * (gridSize - 1), cloneNum]);
+        numTilesChecked = 1;
+
+        GenTile dequeTile;
+
+        while (nextLookAtTile.Count > 0)
+        {
+            dequeTile = nextLookAtTile.Dequeue();
+
+            if (dequeTile != gridAPI.GetGoalTile())
+            {
+                List<GenTile> inRangeTiles = GetInRangeTiles(ref genTiles, dequeTile.index, cloneNum);
+                //Debug.Log(inRangeTiles.Count);
+                for (int i = 0; i < inRangeTiles.Count; i++)
+                {
+                    if (inRangeTiles[i].tileDepth == -1)
+                    {
+                        inRangeTiles[i].tileDepth = dequeTile.tileDepth + 1;
+                        numTilesChecked++;
+                        nextLookAtTile.Enqueue(inRangeTiles[i]);
+                        if (inRangeTiles[i] == gridAPI.GetGoalTile())
+                        {
+                            break;
+                        }
+                        //Debug.Log(inRangeTiles[i].x + ", " + inRangeTiles[i].y);
+                    }
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if (genTiles[gridSize - 1, cloneNum].tileDepth == -1)
+        {
+            genTiles[gridSize - 1, cloneNum].tileDepth = -(gridAPI.CurNumTiles() - numTilesChecked);
+        }
+        //Debug.Log(numTilesVisited);
+    }
+
+    private void GenResetDepth(ref GenTile[,] genTiles, int cloneNum)
+    {
+        int numTiles = gridAPI.CurNumTiles();
+        for (int i = 0; i < numTiles; i++)
+        {
+            genTiles[i, cloneNum].tileDepth = -1;
+        }
     }
 
     private int GetAStarManHeuWMoves(Tile tileToSet)
@@ -797,5 +1039,132 @@ public class BoardDataHandler : MonoBehaviour
         }
 
         return returnTiles;
+    }
+
+    private List<GenTile> GetInRangeTiles(ref GenTile[,] tile, int index, int cloneNum)
+    {
+        List<GenTile> returnTiles = new List<GenTile>();
+        int numMoves = tile[index, cloneNum].numMoves;
+
+        int gridSize = gridAPI.GridSize();
+
+        GenTile tileToAdd;
+        if (numMoves != 0)
+        {
+            if (tile[index, cloneNum].y - numMoves >= 0)
+            {
+                tileToAdd = tile[(tile[index, cloneNum].y - numMoves) * gridSize + tile[index, cloneNum].x, cloneNum];
+                returnTiles.Add(tileToAdd);
+                //Debug.Log("TileValue: " + tileToAdd.GetNumMoves() + "TileDepth Down: " + tileToAdd.GetTileDepth());
+            }
+            if (tile[index, cloneNum].y + numMoves < gridSize)
+            {
+                tileToAdd = tile[(tile[index, cloneNum].y + numMoves) * gridSize + tile[index, cloneNum].x, cloneNum];
+                returnTiles.Add(tileToAdd);
+                //Debug.Log("TileValue: " + tileToAdd.GetNumMoves() + "TileDepth Up: " + tileToAdd.GetTileDepth());
+            }
+
+            if (tile[index, cloneNum].x - numMoves >= 0)
+            {
+                tileToAdd = tile[tile[index, cloneNum].y * gridSize + tile[index, cloneNum].x - numMoves, cloneNum];
+                returnTiles.Add(tileToAdd);
+                //Debug.Log("TileValue: " + tileToAdd.GetNumMoves() + "TileDepth left: " + tileToAdd.GetTileDepth());
+            }
+            if (tile[index, cloneNum].x + numMoves < gridSize)
+            {
+                tileToAdd = tile[tile[index, cloneNum].y * gridSize + tile[index, cloneNum].x + numMoves, cloneNum];
+                returnTiles.Add(tileToAdd);
+                //Debug.Log("TileValue: " + tileToAdd.GetNumMoves() + "TileDepth Right: " + tileToAdd.GetTileDepth());
+            }
+        }
+
+        return returnTiles;
+    }
+
+    private float EvaluateBySumAverage(int divideSide, int divide)
+    {
+        int gridSize = gridAPI.GridSize();
+        int i = (divideSide == 0) ? 0 : gridSize / divide;
+        int j = (divideSide == 1) ? 0 : gridSize / divide;
+
+        float sum = 0;
+        for (; i < gridSize; i++)
+        {
+            for (; j < gridSize; j++)
+            {
+                sum += gridAPI.GetTileByCoord(i, j).GetNumMoves();
+            }
+        }
+
+        sum /= (gridAPI.GridSize() - 1);
+
+        return sum;
+    }
+
+    private float GenEvaluateBySumAverage(ref GenTile[,] genTiles, int cloneNum, int divideSide, int divide)
+    {
+        int gridSize = gridAPI.GridSize();
+        int i = (divideSide == 0) ? gridSize / divide : 0;
+        int j = 0;
+
+        int iMax = gridSize;
+        int jMax = (divideSide == 1) ? (divide - 1) * gridSize / divide : gridSize;
+
+        float sum = 0;
+        for (; i < iMax; i++)
+        {
+            for (; j < jMax; j++)
+            {
+                sum += genTiles[i * gridSize + j, cloneNum].numMoves;
+            }
+        }
+
+        sum /= (gridAPI.GridSize() - 1);
+
+        return sum;
+    }
+
+    private void MateGenTiles(ref GenTile[,] genTiles, int cloneNumA, int cloneNumB, int divideSide, int divide, int greaterSide)
+    {
+        int gridSize = gridAPI.GridSize();
+
+        if(greaterSide == 1)
+        {
+            int i = (divideSide == 0) ? gridSize / divide : 0;
+            int j = 0;
+
+            int iMax = gridSize;
+            int jMax = (divideSide == 1) ? (divide - 1) * gridSize / divide : gridSize;
+
+            int pos = 0;
+
+            for (; i < iMax; i++)
+            {
+                for (; j < jMax; j++)
+                {
+                    pos = i * gridSize + j;
+                    genTiles[pos, cloneNumB].numMoves = genTiles[pos, cloneNumA].numMoves;
+                }
+            }
+        }
+        else
+        {
+            int i = 0;
+            int j = (divideSide == 0) ? 0 : (divide - 1) * gridSize / divide;
+
+            int iMax = (divideSide == 0) ? gridSize / divide : gridSize;
+            int jMax = gridSize;
+
+            int pos = 0;
+
+            for (; i < iMax; i++)
+            {
+                for (; j < jMax; j++)
+                {
+                    pos = i * gridSize + j;
+                    genTiles[pos, cloneNumB].numMoves = genTiles[pos, cloneNumA].numMoves;
+                }
+            }
+        }
     }
 }

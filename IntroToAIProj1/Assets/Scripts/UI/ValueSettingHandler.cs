@@ -19,6 +19,7 @@ public class ValueSettingHandler : MonoBehaviour
     [HideInInspector] public bool doHillClimb = false;
     [HideInInspector] public bool doSPF = false;
     [HideInInspector] public bool doAStar = false;
+    [HideInInspector] public bool doGeneticMating = false;
 
     // Start is called before the first frame update
     void Start()
@@ -132,6 +133,11 @@ public class ValueSettingHandler : MonoBehaviour
     public void DoAStar()
     {
         doAStar = true;
+    }
+
+    public void DoGeneticMating()
+    {
+        doGeneticMating = true;
     }
 
     public void SetTimerText(string _timerText)

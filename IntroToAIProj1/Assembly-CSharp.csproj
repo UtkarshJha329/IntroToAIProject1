@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Camera\CameraManager.cs" />
+    <Compile Include="Assets\Scripts\Genetic\GenTile.cs" />
     <Compile Include="Assets\Scripts\Genetic\TestGenetic.cs" />
     <Compile Include="Assets\Scripts\Grid\BoardDataHandler.cs" />
     <Compile Include="Assets\Scripts\Grid\GridManagerAPI.cs" />

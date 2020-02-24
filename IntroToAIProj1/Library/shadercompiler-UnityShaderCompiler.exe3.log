@@ -1,42 +1,40 @@
 Base path: 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data', plugins path 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
 Cmd: compileComputeKernel
-  api=4 insize=2470 outsize=228 ok=1
+  api=4 insize=9490 outsize=853 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=2466 outsize=2804 ok=1
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(162): undeclared identifier 'randomSide'
+  api=4 insize=7472 outsize=0 ok=0
 Cmd: compileComputeKernel
-  api=4 insize=2719 outsize=3816 ok=1
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(179): undeclared identifier 'dividePoint'
+  api=4 insize=7472 outsize=0 ok=0
 Cmd: compileComputeKernel
-  error: 2 plat 4 at Genetic_Cop_Shader.compute(20): 'wang_hash': no matching 1 parameter function
-  error: 2 plat 4 at Genetic_Cop_Shader.compute(20): syntax error: unexpected token '*'
-  api=4 insize=2855 outsize=0 ok=0
+  api=4 insize=7448 outsize=853 ok=1
 Cmd: compileComputeKernel
-  error: 2 plat 4 at Genetic_Cop_Shader.compute(75): syntax error: unexpected token ';'
-  error: 2 plat 4 at Genetic_Cop_Shader.compute(77): syntax error: unexpected token '{'
-  error: 2 plat 4 at Genetic_Cop_Shader.compute(84): syntax error: unexpected token 'else'
-  api=4 insize=2853 outsize=0 ok=0
+  api=4 insize=7646 outsize=228 ok=1
 Cmd: compileComputeKernel
-  error: 2 plat 4 at Genetic_Cop_Shader.compute(21): syntax error: unexpected token ')'
-  error: 2 plat 4 at Genetic_Cop_Shader.compute(53): undeclared identifier 'x'
-  api=4 insize=2232 outsize=0 ok=0
+  api=4 insize=7856 outsize=853 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=2242 outsize=228 ok=1
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=7594 outsize=858 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=2257 outsize=228 ok=1
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(157): syntax error: unexpected token '{'
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(178): undeclared identifier 'maxX'
+  api=4 insize=7605 outsize=0 ok=0
 Cmd: compileComputeKernel
-  api=4 insize=2292 outsize=228 ok=1
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=7606 outsize=853 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=2276 outsize=228 ok=1
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=7964 outsize=2359 ok=1
 Cmd: compileComputeKernel
-  error: 2 plat 4 at Genetic_Cop_Shader.compute(16): syntax error: unexpected token ';'
-  error: 2 plat 4 at Genetic_Cop_Shader.compute(19): syntax error: unexpected token '{'
-  error: 2 plat 4 at Genetic_Cop_Shader.compute(21): undeclared identifier 'dif'
-  api=4 insize=2253 outsize=0 ok=0
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=7963 outsize=858 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=2266 outsize=228 ok=1
+  api=4 insize=4810 outsize=853 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=2272 outsize=228 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=2274 outsize=228 ok=1
-Cmd: compileComputeKernel
-  api=4 insize=2282 outsize=228 ok=1
+  api=4 insize=4780 outsize=228 ok=1
+Unhandled exception: Protocol error - unexpected end of data (did the Editor crash?)
+
+Quitting shader compiler process

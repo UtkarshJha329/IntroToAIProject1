@@ -1,17 +1,44 @@
 Base path: 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data', plugins path 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
 Cmd: compileComputeKernel
-  error: 1 plat 4 at Genetic_Cop_Shader.compute(46): integer divides may be much slower, try using uints if possible.
-  error: 1 plat 4 at Genetic_Cop_Shader.compute(46): signed/unsigned mismatch, unsigned assumed
-  error: 1 plat 4 at Genetic_Cop_Shader.compute(47): integer divides may be much slower, try using uints if possible.
-  error: 1 plat 4 at Genetic_Cop_Shader.compute(47): signed/unsigned mismatch, unsigned assumed
-  api=4 insize=2464 outsize=2856 ok=1
+  api=4 insize=9490 outsize=7288 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=2651 outsize=3552 ok=1
+  api=4 insize=9478 outsize=7256 ok=1
 Cmd: compileComputeKernel
-  error: 2 plat 4 at Genetic_Cop_Shader.compute(15): 'Random': Not all control paths return a value
-  api=4 insize=2904 outsize=0 ok=0
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(162): undeclared identifier 'randomSide'
+  api=4 insize=7472 outsize=0 ok=0
 Cmd: compileComputeKernel
-  api=4 insize=2839 outsize=228 ok=1
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(179): undeclared identifier 'dividePoint'
+  api=4 insize=7472 outsize=0 ok=0
 Cmd: compileComputeKernel
-  api=4 insize=2254 outsize=228 ok=1
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(179): undeclared identifier 'greaterSide'
+  api=4 insize=7446 outsize=0 ok=0
+Cmd: compileComputeKernel
+  api=4 insize=7448 outsize=858 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=7646 outsize=5080 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=7856 outsize=5152 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=7594 outsize=5052 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(157): syntax error: unexpected token '{'
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(178): undeclared identifier 'maxX'
+  api=4 insize=7605 outsize=0 ok=0
+Cmd: compileComputeKernel
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=7964 outsize=5364 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=7931 outsize=853 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=8030 outsize=228 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at (0): Did not find shader kernel 'DecreaseSum' to compile
+  api=4 insize=4810 outsize=0 ok=0
+Cmd: compileComputeKernel
+  api=4 insize=4780 outsize=858 ok=1
+Unhandled exception: Protocol error - unexpected end of data (did the Editor crash?)
+
+Quitting shader compiler process

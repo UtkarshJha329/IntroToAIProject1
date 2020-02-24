@@ -1,15 +1,43 @@
 Base path: 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data', plugins path 'C:/UnityStuff/UnityEditors/2019.2.9f1/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
 Cmd: compileComputeKernel
-  api=4 insize=2466 outsize=2804 ok=1
+  api=4 insize=9490 outsize=228 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=2466 outsize=228 ok=1
+  api=4 insize=9478 outsize=228 ok=1
 Cmd: compileComputeKernel
-  api=4 insize=2486 outsize=228 ok=1
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(162): undeclared identifier 'randomSide'
+  api=4 insize=7472 outsize=0 ok=0
 Cmd: compileComputeKernel
-  api=4 insize=2488 outsize=228 ok=1
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(166): undeclared identifier 'Min'
+  api=4 insize=7472 outsize=0 ok=0
 Cmd: compileComputeKernel
-  error: 2 plat 4 at Genetic_Cop_Shader.compute(58): undeclared identifier 'x'
-  api=4 insize=2956 outsize=0 ok=0
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(179): undeclared identifier 'dividePoint'
+  api=4 insize=7472 outsize=0 ok=0
 Cmd: compileComputeKernel
-  api=4 insize=2271 outsize=228 ok=1
+  error: 2 plat 4 at Genetic_Cop_Shader.compute(179): undeclared identifier 'greaterSide'
+  api=4 insize=7446 outsize=0 ok=0
+Cmd: compileComputeKernel
+  api=4 insize=7646 outsize=858 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=8002 outsize=5340 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=7594 outsize=853 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=7606 outsize=5120 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at Genetic_Cop_Shader.compute(157): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=7963 outsize=5312 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=7931 outsize=2359 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=8030 outsize=5104 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=4810 outsize=228 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=4780 outsize=853 ok=1
+Unhandled exception: Protocol error - unexpected end of data (did the Editor crash?)
+
+Quitting shader compiler process
